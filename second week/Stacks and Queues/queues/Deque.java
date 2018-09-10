@@ -1,7 +1,7 @@
 /* *****************************************************************************
  *  Name: Deque.java
  *  Date: 2018/09/10
- *  Description: 使用双向链表实现的双向队列
+ *  Description: 使用双向链表实现的双向队列 48N Constant worst-case time
  *  note: 单向链表在addLast时间不符合O(n)，边长数组的内存使用不符合，8N-56N。
  *  author: huipengly
  **************************************************************************** */
@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 public class Deque<Item> implements Iterable<Item> {
     private Node first, last;
-    private int size;
+    private int size;                           //Hints:第一次写的时候都没有考虑更新size
 
     private class Node {
         Item item;
@@ -48,6 +48,7 @@ public class Deque<Item> implements Iterable<Item> {
             first.pre = newFirst;
             first = newFirst;
         }
+        ++size;
     }
 
     public void addLast(Item item) {           // add the item to the end
@@ -66,31 +67,42 @@ public class Deque<Item> implements Iterable<Item> {
             newLast.pre = last;
             last = newLast;
         }
+        ++size;
     }
 
     public Item removeFirst() {                // remove and return the item from the front
         if (isEmpty())
             throw new java.util.NoSuchElementException("remove from an empty deque.");
         Item item = first.item;
-        first = first.next;
+        if (size == 1) {                 // 检查是否只有一个元素，
+            first = null;
+            last = null;
+        }
+        else
+            first = first.next;
         if (isEmpty())
             last = null;
         else {
             first.pre = null;
         }
+        --size;
         return item;
     }
 
-    public Item removeLast() {                 // remove and return the item from the end
+    public Item removeLast() {                  // remove and return the item from the end
         if (isEmpty())
             throw new java.util.NoSuchElementException("remove from an empty.");
         Item item = last.item;
-        last = last.pre;
-        if (isEmpty())
+        if (size == 1) {                 // 检查是否只有一个元素，
             first = null;
-        else {
+            last = null;
+        }
+        else
+            last = last.pre;
+        if (!isEmpty()) {
             last.next = null;
         }
+        --size;
         return item;
     }
 
@@ -110,7 +122,7 @@ public class Deque<Item> implements Iterable<Item> {
         }
 
         public Item next() {
-            if (hasNext())
+            if (!hasNext())
                 throw new java.util.NoSuchElementException("doesn't have Next.");
             Item item = current.item;
             current = current.next;
@@ -120,5 +132,8 @@ public class Deque<Item> implements Iterable<Item> {
 
     public static void main(String[] args)   // unit testing (optional)
     {
+        Deque<Integer> deque = new Deque<Integer>();
+        deque.addLast(0);
+        deque.removeLast();
     }
 }
