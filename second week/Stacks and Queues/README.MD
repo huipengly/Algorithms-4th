@@ -20,7 +20,7 @@
 但是但是，数组不能从中间删除内容，这个地方卡了我很久，最后看了书上的提示才想到。这里存在了思维定式，考虑题目要求，这个随机队列不存在对内容顺序的需求，所以**不需要维护队列**的顺序。数组虽然不能从中间删除，但是可以删除末尾元素，这就意味着，只需要将末尾数据拷贝到当前位置，并缩短实际元素的长度，也就删除了此元素。
 
 ### 2.3 队列读取并输出
-这里就是建立一个随机队列，然后enqueue，再dequeue k个就好了。这个思路无法完成extra的要求，关于extra如何实现见XXX。
+这里就是建立一个随机队列，然后enqueue，再dequeue k个就好了。这个思路无法完成extra的要求，关于extra如何实现见下文。
 ## 3. 实现
 具体实现见代码[Deque](./queues/Deque.java)，[RandomizedQueue](./queues/RandomizedQueue.java)，[Permutation](./queues/Permutation.java)。
 
