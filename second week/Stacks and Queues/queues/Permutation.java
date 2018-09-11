@@ -24,7 +24,7 @@ public class Permutation {
         }
         while (!StdIn.isEmpty()) {
             String str = StdIn.readString();
-            ++counter;
+            ++counter;          // 要先加counter，不然就不是真随机
             if (StdRandom.uniform(counter) < k) {
                 sQueue.dequeue();
                 sQueue.enqueue(str);
