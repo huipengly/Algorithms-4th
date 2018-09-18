@@ -34,20 +34,31 @@ public class FastCollinearPoints {
         findLine();
     }
 
-    public void findLine() {
-        double[] slope = new double[points.length - 1];
-        for (int i = 0; i != points.length - 1; ++i) {
-            Arrays.sort(points, points[i].slopeOrder());                   // 按照关于i点的斜率排序
+    private void findLine() {
+        //double[] slope = new double[points.length - 1];
+        Point[] temp_points = points.clone();
+        for (int i = 0; i != points.length; ++i) {
+            Arrays.sort(temp_points, points[i].slopeOrder());                   // 按照关于i点的斜率排序
             int counter = 0;
             for (int j = 0; j != points.length - 1; ++j) {
-                if (Double.compare(points[i].slopeTo(points[j]), points[i].slopeTo(points[j + 1]))
+                if (Double.compare(points[i].slopeTo(temp_points[j]),
+                                   points[i].slopeTo(temp_points[j + 1]))
                         == 0)       // 斜率相同增加计数值，不同就清零
                     counter++;
                 else {
-                    if (counter >= 4) {  // 共线点超过4个
-                        for (int k = 0; k != counter - 1; --k) {
-                            segmentList.add(new LineSegment(points[j - k], points[j - k - 1]));
-                        }
+                    if (counter > 1) {  // 共线点超过4个，既有超过1对的相等
+                        // for (int k = 0; k != counter - 1; --k) {
+                        //     segmentList.add(new LineSegment(points[j - k], points[j - k - 1]));
+                        // }
+                        segmentList
+                                .add(new LineSegment(points[i], temp_points[j]));
+                    }
+                    counter = 0;
+                }
+                if (j == points.length - 2) {   // 处理最后一段相等
+                    if (counter > 1) {  // 共线点超过4个，既有超过1对的相等
+                        segmentList.add(new LineSegment(points[i],
+                                                        temp_points[j + 1]));
                     }
                     counter = 0;
                 }
@@ -73,7 +84,7 @@ public class FastCollinearPoints {
     public static void main(String[] args) {
         // read the n points from a file
         //In in = new In(args[0]);
-        In in = new In("input10.txt"); //本地测试使用
+        In in = new In("input8.txt"); //本地测试使用
         int n = in.readInt();
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
@@ -86,7 +97,6 @@ public class FastCollinearPoints {
         StdDraw.enableDoubleBuffering();
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
-        StdDraw.setPenColor(StdDraw.RED);
         StdDraw.setPenRadius(0.01);
         for (Point p : points) {
             p.draw();
@@ -94,7 +104,7 @@ public class FastCollinearPoints {
         StdDraw.show();
 
         // print and draw the line segments
-        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        FastCollinearPoints collinear = new FastCollinearPoints(points);
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);
             segment.draw();
