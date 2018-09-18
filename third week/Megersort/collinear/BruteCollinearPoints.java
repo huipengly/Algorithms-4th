@@ -43,13 +43,13 @@ public class BruteCollinearPoints {
                                 segmentList.add(new LineSegment(points[i], points[j]));
                                 segmentList.add(new LineSegment(points[j], points[k]));
                                 segmentList.add(new LineSegment(points[k], points[i1]));
-                                ++number;
                             }
                         }
                     }
                 }
             }
         }
+        number = segmentList.size();
     }
 
     public int numberOfSegments() {        // the number of line segments
@@ -57,7 +57,7 @@ public class BruteCollinearPoints {
     }
 
     public LineSegment[] segments() {               // the line segments
-        LineSegment[] segments = new LineSegment[segmentList.size()];
+        LineSegment[] segments = new LineSegment[number];
         int i = 0;
         for (LineSegment seg : segmentList) {
             segments[i++] = seg;
