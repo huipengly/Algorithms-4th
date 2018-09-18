@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class BruteCollinearPoints {
-    //Point[] points;
+    private Point[] points;
     private int number = 0;
     //LineSegment[] lineSegments = new LineSegment[3];
     private ArrayList<LineSegment> segmentList = new ArrayList<LineSegment>();
@@ -26,17 +26,18 @@ public class BruteCollinearPoints {
             if (points[i] == null)
                 throw new java.lang.IllegalArgumentException("include null Point.");
         }
-        Arrays.sort(points);
-        for (int i = 0; i != points.length - 1; ++i) {
-            if (points[i].equals(points[i + 1]))
+        this.points = points.clone();
+        Arrays.sort(this.points);
+        for (int i = 0; i != this.points.length - 1; ++i) {
+            if (this.points[i].equals(this.points[i + 1]))
                 throw new java.lang.IllegalArgumentException("include same Point.");
         }
         //this.points = points;
-        if (points.length > 3)
-            findLine(points);
+        if (this.points.length > 3)
+            findLine();
     }
 
-    private void findLine(Point[] points) {    // 寻找连成线的四个点
+    private void findLine() {    // 寻找连成线的四个点
         for (int i = 0; i != points.length - 3; ++i) {
             for (int j = i + 1; j != points.length - 2; ++j) {
                 for (int k = j + 1; k != points.length - 1; ++k) {
@@ -75,7 +76,7 @@ public class BruteCollinearPoints {
     public static void main(String[] args) {
         // read the n points from a file
         // In in = new In(args[0]);
-        In in = new In("input1.txt"); //本地测试使用
+        In in = new In("input8.txt"); //本地测试使用
         int n = in.readInt();
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
