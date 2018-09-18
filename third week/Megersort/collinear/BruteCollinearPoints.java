@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class BruteCollinearPoints {
-    Point[] points;
+    //Point[] points;
     int number = 0;
     LineSegment[] lineSegments = new LineSegment[3];
 
@@ -25,11 +25,11 @@ public class BruteCollinearPoints {
             if (points[i].equals(points[i + 1]))
                 throw new java.lang.IllegalArgumentException("include same Point.");
         }
-        this.points = points;
-        findLine();
+        //this.points = points;
+        findLine(points);
     }
 
-    public void findLine() {    // 寻找连成线的四个点
+    public void findLine(Point[] points) {    // 寻找连成线的四个点
         for (int i = 0; i != points.length - 3; ++i) {
             for (int j = i + 1; j != points.length - 2; ++j) {
                 for (int k = j + 1; k != points.length - 1; ++k) {
