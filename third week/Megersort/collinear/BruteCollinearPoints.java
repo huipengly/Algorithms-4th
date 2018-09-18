@@ -5,6 +5,10 @@
  *  author: huipengly
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -66,13 +70,35 @@ public class BruteCollinearPoints {
     }
 
     public static void main(String[] args) {
-        Point[] p = new Point[6];
-        p[0] = new Point(19000, 10000);
-        p[1] = new Point(18000, 10000);
-        p[2] = new Point(32000, 10000);
-        p[3] = new Point(21000, 10000);
-        p[4] = new Point(1234, 5678);
-        p[5] = new Point(14000, 10000);
-        BruteCollinearPoints bcp = new BruteCollinearPoints(p);
+        // read the n points from a file
+        //In in = new In(args[0]);
+        In in = new In("input56.txt"); //本地测试使用
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+
+        // draw the points
+        StdDraw.enableDoubleBuffering();
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.setPenRadius(0.01);
+        for (Point p : points) {
+            p.draw();
+        }
+        StdDraw.show();
+
+        // print and draw the line segments
+        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+            segment.draw();
+        }
+        StdDraw.show();
+
     }
 }
