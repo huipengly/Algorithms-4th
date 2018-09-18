@@ -5,13 +5,15 @@
  *  author: huipengly
  **************************************************************************** */
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
 public class BruteCollinearPoints {
     //Point[] points;
-    int number = 0;
-    LineSegment[] lineSegments = new LineSegment[3];
+    private int number = 0;
+    //LineSegment[] lineSegments = new LineSegment[3];
+    private ArrayList<LineSegment> segmentList = new ArrayList<LineSegment>();
 
     public BruteCollinearPoints(Point[] points) {    // finds all line segments containing 4 points
         if (points == null)
@@ -36,14 +38,12 @@ public class BruteCollinearPoints {
                     Comparator<Point> comparator = points[i]
                             .slopeOrder();      // 与point[i]点连线的斜率作比较
                     if (comparator.compare(points[j], points[k]) == 0) {    // 斜率相同说明此i,j,k共线，寻找下一个l
-                        lineSegments[0] = new LineSegment(points[i], points[j]);
-                        lineSegments[1] = new LineSegment(points[j], points[k]);
-                        number = 2;
                         for (int i1 = k + 1; i1 != points.length; ++i1) {
                             if (comparator.compare(points[k], points[i1]) == 0) {
-                                lineSegments[2] = new LineSegment(points[k], points[i1]);
+                                segmentList.add(new LineSegment(points[i], points[j]));
+                                segmentList.add(new LineSegment(points[j], points[k]));
+                                segmentList.add(new LineSegment(points[k], points[i1]));
                                 ++number;
-                                return;
                             }
                         }
                     }
@@ -57,7 +57,12 @@ public class BruteCollinearPoints {
     }
 
     public LineSegment[] segments() {               // the line segments
-        return lineSegments;
+        LineSegment[] segments = new LineSegment[segmentList.size()];
+        int i = 0;
+        for (LineSegment seg : segmentList) {
+            segments[i++] = seg;
+        }
+        return segments;
     }
 
     public static void main(String[] args) {
