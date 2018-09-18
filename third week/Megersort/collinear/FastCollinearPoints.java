@@ -19,46 +19,49 @@ public class FastCollinearPoints {
 
     public FastCollinearPoints(
             Point[] points) {    // finds all line segments containing 4 or more points
-        this.points = points;
-        if (this.points == null)
+        if (points == null)
             throw new java.lang.IllegalArgumentException("argument to the constructor is null.");
-        for (int i = 0; i != this.points.length; ++i) {
+        for (int i = 0; i != points.length; ++i) {
             if (points[i] == null)
                 throw new java.lang.IllegalArgumentException("include null Point.");
         }
+        this.points = points.clone();
         Arrays.sort(this.points);
         for (int i = 0; i != this.points.length - 1; ++i) {
             if (this.points[i].equals(this.points[i + 1]))
                 throw new java.lang.IllegalArgumentException("include same Point.");
         }
-        findLine();
+        if (this.points.length > 3)
+            findLine();
     }
 
     private void findLine() {
         //double[] slope = new double[points.length - 1];
-        Point[] temp_points = points.clone();
+        //Point[] temp_points = points.clone();
         for (int i = 0; i != points.length; ++i) {
-            Arrays.sort(temp_points, points[i].slopeOrder());                   // 按照关于i点的斜率排序
+            Point[] tempPoints = points.clone();
+            Arrays.sort(tempPoints, points[i].slopeOrder());                   // 按照关于i点的斜率排序
             int counter = 0;
             for (int j = 0; j != points.length - 1; ++j) {
-                if (Double.compare(points[i].slopeTo(temp_points[j]),
-                                   points[i].slopeTo(temp_points[j + 1]))
+                if (Double.compare(points[i].slopeTo(tempPoints[j]),
+                                   points[i].slopeTo(tempPoints[j + 1]))
                         == 0)       // 斜率相同增加计数值，不同就清零
                     counter++;
                 else {
-                    if (counter > 1) {  // 共线点超过4个，既有超过1对的相等
+                    if (counter > 1 && (points[i].compareTo(tempPoints[j - counter])
+                            // 与的条件是判断是否为线段最开始的点，因为首先是根据点的大小排序，再根据相对斜率排序的，排序是稳定的，不会打乱点的大小。判断计算斜率的参考点和同斜率最小的点，就知道是否是起始点。这里最开始没想到是觉得斜率A-B和B-A不一样，傻了。
+                            <= 0)) {  // 共线点超过4个，既有超过1对的相等
                         // for (int k = 0; k != counter - 1; --k) {
                         //     segmentList.add(new LineSegment(points[j - k], points[j - k - 1]));
                         // }
-                        segmentList
-                                .add(new LineSegment(points[i], temp_points[j]));
+                        segmentList.add(new LineSegment(points[i], tempPoints[j]));
                     }
                     counter = 0;
                 }
                 if (j == points.length - 2) {   // 处理最后一段相等
-                    if (counter > 1) {  // 共线点超过4个，既有超过1对的相等
-                        segmentList.add(new LineSegment(points[i],
-                                                        temp_points[j + 1]));
+                    if (counter > 1 && (points[i].compareTo(tempPoints[j + 1 - counter])
+                            <= 0)) {  // 共线点超过4个，既有超过1对的相等
+                        segmentList.add(new LineSegment(points[i], tempPoints[j + 1]));
                     }
                     counter = 0;
                 }
@@ -84,7 +87,7 @@ public class FastCollinearPoints {
     public static void main(String[] args) {
         // read the n points from a file
         //In in = new In(args[0]);
-        In in = new In("input8.txt"); //本地测试使用
+        In in = new In("input20.txt"); //本地测试使用
         int n = in.readInt();
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
