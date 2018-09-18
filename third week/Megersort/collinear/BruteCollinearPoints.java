@@ -32,10 +32,11 @@ public class BruteCollinearPoints {
                 throw new java.lang.IllegalArgumentException("include same Point.");
         }
         //this.points = points;
-        findLine(points);
+        if (points.length > 3)
+            findLine(points);
     }
 
-    public void findLine(Point[] points) {    // 寻找连成线的四个点
+    private void findLine(Point[] points) {    // 寻找连成线的四个点
         for (int i = 0; i != points.length - 3; ++i) {
             for (int j = i + 1; j != points.length - 2; ++j) {
                 for (int k = j + 1; k != points.length - 1; ++k) {
@@ -44,9 +45,11 @@ public class BruteCollinearPoints {
                     if (comparator.compare(points[j], points[k]) == 0) {    // 斜率相同说明此i,j,k共线，寻找下一个l
                         for (int i1 = k + 1; i1 != points.length; ++i1) {
                             if (comparator.compare(points[k], points[i1]) == 0) {
-                                segmentList.add(new LineSegment(points[i], points[j]));
-                                segmentList.add(new LineSegment(points[j], points[k]));
-                                segmentList.add(new LineSegment(points[k], points[i1]));
+                                // segmentList.add(new LineSegment(points[i], points[j]));
+                                // segmentList.add(new LineSegment(points[j], points[k]));
+                                // segmentList.add(new LineSegment(points[k], points[i1]));
+
+                                segmentList.add(new LineSegment(points[i], points[i1]));
                             }
                         }
                     }
@@ -71,8 +74,8 @@ public class BruteCollinearPoints {
 
     public static void main(String[] args) {
         // read the n points from a file
-        //In in = new In(args[0]);
-        In in = new In("input56.txt"); //本地测试使用
+        // In in = new In(args[0]);
+        In in = new In("input1.txt"); //本地测试使用
         int n = in.readInt();
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
@@ -85,7 +88,6 @@ public class BruteCollinearPoints {
         StdDraw.enableDoubleBuffering();
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
-        StdDraw.setPenColor(StdDraw.RED);
         StdDraw.setPenRadius(0.01);
         for (Point p : points) {
             p.draw();
@@ -99,6 +101,5 @@ public class BruteCollinearPoints {
             segment.draw();
         }
         StdDraw.show();
-
     }
 }
