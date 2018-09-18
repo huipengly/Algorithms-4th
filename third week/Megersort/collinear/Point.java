@@ -8,6 +8,7 @@
  *
  ******************************************************************************/
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.Arrays;
@@ -140,22 +141,17 @@ public class Point implements Comparable<Point> {
      */
     public static void main(String[] args) {
         /* YOUR CODE HERE */
-        Point p1 = new Point(0, 0);
-        Point p2 = new Point(2, 8);
-        Point p3 = new Point(5, 5);
-        Point p4 = new Point(0, 10);
-        Point p5 = new Point(10, 0);
+        In in = new In("input8.txt"); //本地测试使用
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+        Arrays.sort(points);
+        Point p0 = points[0];
 
-        p1.compareTo(p2);
-
-        Point[] parr = new Point[5];
-        parr[0] = p1;
-        parr[1] = p2;
-        parr[2] = p3;
-        parr[3] = p4;
-        parr[4] = p5;
-        Arrays.sort(parr);
-
-        Arrays.sort(parr, p1.slopeOrder());
+        Arrays.sort(points, p0.slopeOrder());
     }
 }
