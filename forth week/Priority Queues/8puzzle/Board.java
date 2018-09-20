@@ -54,7 +54,7 @@ public class Board {
                     // 除以维度就是应在的行，除维度的余数是应在的列
                     int desiredRow = (blocks[i][j] - 1) / dimension;
                     int desiredCol = (blocks[i][j] - 1) % dimension;    // 数从1开始记录的，所以-1再余数
-                    tempManhattan += desiredRow - i + desiredCol - j;
+                    tempManhattan += Math.abs(desiredRow - i) + Math.abs(desiredCol - j);
                 }
             }
         }
