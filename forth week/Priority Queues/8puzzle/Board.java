@@ -52,8 +52,8 @@ public class Board {
             for (int j = 0; j != dimension; ++j) {
                 if (blocks[i][j] != 0) {        // 非空白才判断
                     // 除以维度就是应在的行，除维度的余数是应在的列
-                    int desiredRow = blocks[i][j] / dimension;
-                    int desiredCol = blocks[i][j] % dimension;
+                    int desiredRow = (blocks[i][j] - 1) / dimension;
+                    int desiredCol = (blocks[i][j] - 1) % dimension;    // 数从1开始记录的，所以-1再余数
                     tempManhattan += desiredRow - i + desiredCol - j;
                 }
             }
@@ -160,10 +160,9 @@ public class Board {
         for (int i = 0; i != dimension; ++i) {
             for (int j = 0; j != dimension; ++j) {
                 if (blocks[i][j] != 0)
-                    str += String.valueOf(blocks[i][j]);
+                    str += String.valueOf(blocks[i][j]) + " ";
                 else
-                    str += " ";
-                str += " ";
+                    str += "  ";
             }
             str += "\n";
         }
@@ -171,7 +170,7 @@ public class Board {
     }
 
     public static void main(String[] args) { // unit tests (not graded)
-        In in = new In("puzzle01.txt");
+        In in = new In("puzzle011.txt");
         int n = in.readInt();
         int[][] blocks = new int[n][n];
         for (int i = 0; i < n; i++)
@@ -182,5 +181,6 @@ public class Board {
         for (Board b : initial.neighbors()) {
             StdOut.print(b.toString());
         }
+        StdOut.print(initial.twin().toString());
     }
 }
