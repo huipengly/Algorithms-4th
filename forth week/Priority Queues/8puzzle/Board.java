@@ -159,10 +159,7 @@ public class Board {
         String str = dimension + "\n";
         for (int i = 0; i != dimension; ++i) {
             for (int j = 0; j != dimension; ++j) {
-                if (blocks[i][j] != 0)
-                    str += String.valueOf(blocks[i][j]) + " ";
-                else
-                    str += "  ";
+                str += String.valueOf(blocks[i][j]) + " ";
             }
             str += "\n";
         }
