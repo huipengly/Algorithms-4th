@@ -5,27 +5,26 @@
  *  author: huipengly
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Stack;
+import edu.princeton.cs.algs4.StdOut;
 
 public class Board {
     private final int dimension;
     private final int hamming;      // 提示初始化为0时多余的
     private final int manhattan;
     private final boolean isGoal;
-    private final int[][] blocks;
+    private final int[][] blocks;   // java二维数组不能用clone，然后泛型也有问题
     private int blankCol;           // 记录空白块位置
     private int blankRow;
 
     public Board(int[][] blocks) {           // construct a board from an n-by-n array of blocks
-        this.blocks = blocks.clone();
-        dimension = calculateDimension();
+        dimension = blocks.length;
+        this.blocks = new int[dimension][dimension];
+        my2DimensionArrayCopy(this.blocks, blocks);
         hamming = calculateHamming();
         manhattan = calculateManhattan();
         isGoal = calculateIsGoal();
-    }
-
-    private int calculateDimension() {
-        return blocks[0].length;
     }
 
     // 判断当前块里的值和预想值是否相同，不同就加hamming
@@ -36,7 +35,7 @@ public class Board {
                 // if (blocks[i][j] != (i * dimension + j + 1) && blocks[i][j] != 0)
                 //     tempHamming++;
                 if (blocks[i][j] == 0) {    // 记录空白块位置
-                    blankRow = j;
+                    blankRow = i;
                     blankCol = j;
                 }
                 else if (blocks[i][j] != (i * dimension + j + 1))   // 判断是否相同
@@ -72,6 +71,16 @@ public class Board {
         return true;
     }
 
+    private void my2DimensionArrayCopy(int[][] lhs, int[][] rhs) {
+        if (lhs == null || rhs == null)       // 空数组返回，和数组维度不等的返回
+            throw new java.lang.NullPointerException();
+        assert (lhs.length != rhs.length || lhs[0].length != rhs[0].length);
+        for (int i = 0; i != lhs.length; ++i) {
+            for (int j = 0; j != lhs[0].length; ++j) {
+                lhs[i][j] = rhs[i][j];
+            }
+        }
+    }
 
     // (where blocks[i][j] = block in row i, column j)
     public int dimension() {                // board dimension n
@@ -97,7 +106,8 @@ public class Board {
     }
 
     public Board twin() {                   // a board that is obtained by exchanging any pair of blocks 这里没有说随机交换，我就只在前三个中交换非空的两个
-        int[][] twinBlocks = blocks.clone();
+        int[][] twinBlocks = new int[dimension][dimension];
+        my2DimensionArrayCopy(twinBlocks, blocks);
         if (twinBlocks[0][0] != 0 && twinBlocks[0][1] != 0) {
             swap(twinBlocks, 0, 0, 0, 1);
         }
@@ -126,40 +136,51 @@ public class Board {
     public Iterable<Board> neighbors() {    // all neighboring boards
         Stack<Board> neighborStack = new Stack<Board>();
         if (blankRow != 0)  // 判断某个方向是否在边界，不在就可移动这个方向上的块
-            neighborStack.push(moveBlankSquare(1, 0));
-        if (blankRow != dimension - 1)
             neighborStack.push(moveBlankSquare(-1, 0));
+        if (blankRow != dimension - 1)
+            neighborStack.push(moveBlankSquare(1, 0));
         if (blankCol != 0)
-            neighborStack.push(moveBlankSquare(0, 1));
-        if (blankCol != dimension - 1)
             neighborStack.push(moveBlankSquare(0, -1));
+        if (blankCol != dimension - 1)
+            neighborStack.push(moveBlankSquare(0, 1));
         return neighborStack;
     }
 
     private Board moveBlankSquare(int row, int col) {         // 移动空白块，row和col分别表示向上下左右移动，只能取+-1和0
         assert row > 1 || row < -1 || col > 1 || col < -1;      // 行列移动超过一行，错误
         assert (Math.abs(row) + Math.abs(col)) < 1;             // 行列都没有移动，错误
-        int[][] movedBlocks = blocks.clone();
-        swap(movedBlocks, row, col, blankRow, blankCol);        // 交换移动行和空白行
+        int[][] movedBlocks = new int[dimension][dimension];
+        my2DimensionArrayCopy(movedBlocks, blocks);
+        swap(movedBlocks, blankRow + row, blankCol + col, blankRow, blankCol);        // 交换移动行和空白行
         return new Board(movedBlocks);
     }
 
     public String toString() {              // string representation of this board (in the output format specified below)
-        String str = "";
+        String str = dimension + "\n";
         for (int i = 0; i != dimension; ++i) {
             for (int j = 0; j != dimension; ++j) {
                 if (blocks[i][j] != 0)
                     str += String.valueOf(blocks[i][j]);
                 else
-                    str += ' ';
-                str += ' ';
+                    str += " ";
+                str += " ";
             }
-            str += '\t';
+            str += "\n";
         }
         return str;
     }
 
     public static void main(String[] args) { // unit tests (not graded)
-
+        In in = new In("puzzle01.txt");
+        int n = in.readInt();
+        int[][] blocks = new int[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                blocks[i][j] = in.readInt();
+        Board initial = new Board(blocks);
+        StdOut.print(initial.toString());
+        for (Board b : initial.neighbors()) {
+            StdOut.print(b.toString());
+        }
     }
 }
