@@ -99,16 +99,16 @@ public class Board {
         arr[i2][j2] = temp;
     }
 
-    public Board twin() {                   // a board that is obtained by exchanging any pair of blocks 这里没有说随机交换，我就只在前三个中交换非空的两个
+    public Board twin() {                   // a board that is obtained by exchanging any pair of blocks 这里不需要随机交换，这里将四角中其中三个中的非空角交换。这样易于处理不同大小的board
         int[][] twinBlocks = new int[dimension][dimension];
         my2DimensionArrayCopy(twinBlocks, blocks);
-        if (twinBlocks[0][0] != 0 && twinBlocks[0][1] != 0) {
+        if (twinBlocks[0][0] != 0 && twinBlocks[0][dimension - 1] != 0) {
             swap(twinBlocks, 0, 0, 0, 1);
         }
-        else if (twinBlocks[0][0] != 0 && twinBlocks[0][2] != 0) {
+        else if (twinBlocks[0][0] != 0 && twinBlocks[dimension - 1][0] != 0) {
             swap(twinBlocks, 0, 0, 0, 2);
         }
-        else if (twinBlocks[0][1] != 0 && twinBlocks[0][2] != 0) {
+        else if (twinBlocks[0][dimension - 1] != 0 && twinBlocks[dimension - 1][0] != 0) {
             swap(twinBlocks, 0, 1, 0, 2);
         }
 
