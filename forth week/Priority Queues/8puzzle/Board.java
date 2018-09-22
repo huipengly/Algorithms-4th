@@ -5,7 +5,6 @@
  *  author: huipengly
  **************************************************************************** */
 
-import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -161,17 +160,31 @@ public class Board {
     }
 
     public static void main(String[] args) { // unit tests (not graded)
-        In in = new In("puzzle011.txt");
-        int n = in.readInt();
-        int[][] blocks = new int[n][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                blocks[i][j] = in.readInt();
-        Board initial = new Board(blocks);
-        StdOut.print(initial.toString());
-        for (Board b : initial.neighbors()) {
-            StdOut.print(b.toString());
+        // In in = new In("puzzle011.txt");
+        // int n = in.readInt();
+        // int[][] blocks = new int[n][n];
+        // for (int i = 0; i < n; i++)
+        //     for (int j = 0; j < n; j++)
+        //         blocks[i][j] = in.readInt();
+        // Board initial = new Board(blocks);
+        // StdOut.print(initial.toString());
+        // for (Board b : initial.neighbors()) {
+        //     StdOut.print(b.toString());
+        // }
+        // StdOut.print(initial.twin().toString());
+        int[][] blocks1 = new int[2][2];
+        int[][] blocks2 = new int[2][2];
+        blocks1[0][0] = 2;
+        blocks1[0][1] = 3;
+        blocks1[1][0] = 0;
+        blocks1[1][1] = 1;
+        blocks2[0][0] = 0;
+        blocks2[0][1] = 3;
+        blocks2[1][0] = 1;
+        blocks2[1][1] = 2;
+        Board board1 = new Board(blocks1), board2 = new Board(blocks2);
+        if (board1.equals(board2)) {
+            StdOut.print(1);
         }
-        StdOut.print(initial.twin().toString());
     }
 }
