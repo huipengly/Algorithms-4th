@@ -103,13 +103,13 @@ public class Board {
         int[][] twinBlocks = new int[dimension][dimension];
         my2DimensionArrayCopy(twinBlocks, blocks);
         if (twinBlocks[0][0] != 0 && twinBlocks[0][dimension - 1] != 0) {
-            swap(twinBlocks, 0, 0, 0, 1);
+            swap(twinBlocks, 0, 0, 0, dimension - 1);
         }
         else if (twinBlocks[0][0] != 0 && twinBlocks[dimension - 1][0] != 0) {
-            swap(twinBlocks, 0, 0, 0, 2);
+            swap(twinBlocks, 0, 0, dimension - 1, 0);
         }
         else if (twinBlocks[0][dimension - 1] != 0 && twinBlocks[dimension - 1][0] != 0) {
-            swap(twinBlocks, 0, 1, 0, 2);
+            swap(twinBlocks, 0, dimension - 1, dimension - 1, 0);
         }
 
         return new Board(twinBlocks);
