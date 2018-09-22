@@ -62,13 +62,7 @@ public class Board {
     }
 
     private boolean calculateIsGoal() {
-        for (int i = 0; i != dimension; ++i) {
-            for (int j = 0; j != dimension; ++j) {
-                if (blocks[i][j] != (i * dimension + j + 1) && blocks[i][j] != 0)
-                    return false;
-            }
-        }
-        return true;
+        return hamming == 0;
     }
 
     private void my2DimensionArrayCopy(int[][] lhs, int[][] rhs) {
