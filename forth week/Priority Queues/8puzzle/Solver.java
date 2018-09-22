@@ -7,12 +7,12 @@
 
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
-import edu.princeton.cs.algs4.Stack;
+import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdOut;
 
 public class Solver {
     private int move;
-    private Stack<Board> solutions = new Stack<>();
+    private Queue<Board> solutions = new Queue<>();
 
     private class SearchNode implements Comparable<SearchNode> {
         private Board board;
@@ -71,9 +71,9 @@ public class Solver {
         }
         if (!twinSearchNode.board.isGoal()) {
             move = searchNode.getMove();
-            solutions.push(initial);
+            solutions.enqueue(initial);
             while (searchNode.pre != null) {                        // 记录搜索过程
-                solutions.push(searchNode.board);
+                solutions.enqueue(searchNode.board);
                 searchNode = searchNode.pre;
             }
         }
@@ -95,7 +95,7 @@ public class Solver {
 
     public static void main(String[] args) {    // solve a slider puzzle (given below)
         // create initial board from file
-        In in = new In("puzzle04.txt");
+        In in = new In("puzzle01.txt");
         int n = in.readInt();
         int[][] blocks = new int[n][n];
         for (int i = 0; i < n; i++)
