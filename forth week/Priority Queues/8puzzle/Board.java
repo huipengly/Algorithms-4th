@@ -18,6 +18,9 @@ public class Board {
     private int blankRow;
 
     public Board(int[][] blocks) {           // construct a board from an n-by-n array of blocks
+        if (blocks == null) {
+            throw new java.lang.IllegalArgumentException();
+        }
         dimension = blocks.length;
         this.blocks = new int[dimension][dimension];
         my2DimensionArrayCopy(this.blocks, blocks);
