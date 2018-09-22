@@ -1,7 +1,7 @@
 # [Programming Assignment 4: 8 Puzzle](http://coursera.cs.princeton.edu/algs4/assignments/8puzzle.html)
 ## 问题
 ### 1. 问题翻译
-这回读题读的头大~~（英语差吃亏了）~~，我就先按照自己的理解写下题目的翻译，再写重述性质的内容。
+这回读题读的头大，英语差吃亏了，我就先按照自己的理解写下题目的翻译，再写重述性质的内容。
 
 使用A*算法编写一个程序解决各种类型的数字推盘游戏。
 
