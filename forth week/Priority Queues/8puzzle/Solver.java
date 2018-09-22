@@ -48,6 +48,9 @@ public class Solver {
 
     public Solver(
             Board initial) {                    // find a solution to the initial board (using the A* algorithm)
+        if (initial == null) {
+            throw new java.lang.IllegalArgumentException("can't init with null Board");
+        }
         SearchNode searchNode = new SearchNode(initial);        // 搜索节点初始化
         SearchNode twinSearchNode = new SearchNode(initial.twin());
         MinPQ<SearchNode> searchNodeMinPQ = new MinPQ<>();      // 搜索节点优先队列，按优先级小的
@@ -90,7 +93,7 @@ public class Solver {
     }
 
     public Iterable<Board> solution() {         // sequence of boards in a shortest solution; null if unsolvable
-        return solutions;
+        return solutions.size() > 0 ? solutions : null;
     }
 
     public static void main(String[] args) {    // solve a slider puzzle (given below)
@@ -101,7 +104,8 @@ public class Solver {
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
                 blocks[i][j] = in.readInt();
-        Board initial = new Board(blocks);
+        // Board initial = new Board(blocks);
+        Board initial = null;
 
         // solve the puzzle
         Solver solver = new Solver(initial);
