@@ -10,57 +10,61 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.Comparator;
-
 public class Solver {
     private int move;
     private Stack<Board> solutions = new Stack<>();
 
+    private class SearchNode implements Comparable<SearchNode> {
+        private Board board;
+        private SearchNode pre;
+        private int move;
+        private int priority;
+
+        public SearchNode(Board board) {
+            this.board = board;
+            pre = null;
+            move = 0;
+            priority = move + this.board.manhattan();
+        }
+
+        public SearchNode(Board board, SearchNode pre) {
+            this.board = board;
+            this.pre = pre;
+            move = pre.move + 1;
+            priority = move + this.board.manhattan();
+        }
+
+        public int getMove() {
+            return move;
+        }
+
+        public int compareTo(SearchNode that) {
+            if (this.priority < that.priority) return -1;
+            if (that.priority < this.priority) return 1;
+            return 0;
+        }
+
+    }
+
     public Solver(
             Board initial) {                    // find a solution to the initial board (using the A* algorithm)
-        Stack<Board> calculateSolution = new Stack<>(); // 使用stack是因为中间会有些不合适的方向，要出栈
-        calculateSolution.push(initial);
-        MinPQ<Board> boardMinPQ = new MinPQ<>(
-                Comparator.comparing(Board::manhattan));            // 这个怎么根据manhattan比较？
-        Board predecessor, searchNode;
-        predecessor = initial;
-        searchNode = initial;
-        while (!searchNode.isGoal()) {
-            for (Board board : searchNode.neighbors()) {    // 将当前的搜索点的邻居加入优先队列
-                if (!board.equals(predecessor)) {           // critical optimization.新邻居和上一个搜索相同则不加入
-                    boardMinPQ.insert(board);
+        SearchNode searchNode = new SearchNode(initial);        // 搜索节点初始化
+        MinPQ<SearchNode> searchNodeMinPQ = new MinPQ<>();      // 搜索节点优先队列，按优先级小的
+        while (!searchNode.board.isGoal()) {                    // 判断搜索节点是否找到解
+            for (Board board : searchNode.board.neighbors()) {  // 添加搜索节点的邻居到优先队列
+                /* 如果前一个节点为空节点，则添加所有的邻居节点 */
+                /* 如果邻居和当前搜索节点的前一个节点相同，则不添加。 题目中第一个优化项 */
+                if (searchNode.pre == null || !board.equals(searchNode.pre.board)) {
+                    searchNodeMinPQ.insert(new SearchNode(board, searchNode));
                 }
             }
-            //predecessor = searchNode;                       // 更新上一个搜索点
-            searchNode = boardMinPQ.delMin();               // 更新搜索点
-            boolean isNeighbor = false;
-            for (Board pre : calculateSolution) {          // 在走过的路中寻找他的父节点，这里最开始用了pop的方法，是错误的，不能删除当时没有用的过程，可能之后还要用
-                predecessor = pre;
-                for (Board board : pre.neighbors()) {      // 判断当前搜索点是否是上一个点的子节点
-                    if (searchNode.equals(board)) {
-                        isNeighbor = true;
-                        break;
-                    }
-                }
-                if (isNeighbor)                             // 找到父节点退出寻找
-                    break;
-            }
-            calculateSolution.push(searchNode);             // 将搜索点加入到求解顺序路线
+            searchNode = searchNodeMinPQ.delMin();              // 将优先级最低的作为下一个搜索节点
         }
-
-        Board end = calculateSolution.pop();
-        solutions.push(end);
-        for (Board pre : calculateSolution) {               // 寻找整个还原过程，从寻找过程的最后向initial节点寻找
-            for (Board board : pre.neighbors()) {
-                if (end.equals(board)) {
-                    end = pre;                              // 如果是此节点的子节点，将此节点更新为end
-                    solutions.push(end);
-                    break;
-                }
-            }
+        move = searchNode.getMove();
+        while (searchNode.pre != null) {                        // 记录搜索过程
+            solutions.push(searchNode.board);
+            searchNode = searchNode.pre;
         }
-
-        move = solutions.size() - 1;                        // 包含初始broad，所以减1
     }
 
     public boolean isSolvable() {               // is the initial board solvable?
@@ -77,7 +81,7 @@ public class Solver {
 
     public static void main(String[] args) {    // solve a slider puzzle (given below)
         // create initial board from file
-        In in = new In("puzzle3x3-11.txt");
+        In in = new In("puzzle4x4-31.txt");
         int n = in.readInt();
         int[][] blocks = new int[n][n];
         for (int i = 0; i < n; i++)
