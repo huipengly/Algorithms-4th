@@ -126,6 +126,15 @@ public class Board {
         if (this.dimension() != that.dimension()) return false;
         if (this.hamming() != that.hamming()) return false;
         if (this.manhattan() != that.manhattan()) return false;
+
+        // 不能只判断上面几项，会有错。但是竟然能访问私有的，还是不懂java
+        for (int i = 0; i != dimension; ++i) {
+            for (int j = 0; j != dimension; ++j) {
+                if (blocks[i][j] != that.blocks[i][j]) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -177,14 +186,14 @@ public class Board {
         // StdOut.print(initial.twin().toString());
         int[][] blocks1 = new int[2][2];
         int[][] blocks2 = new int[2][2];
-        blocks1[0][0] = 2;
-        blocks1[0][1] = 3;
-        blocks1[1][0] = 0;
-        blocks1[1][1] = 1;
-        blocks2[0][0] = 0;
+        blocks1[0][0] = 0;
+        blocks1[0][1] = 2;
+        blocks1[1][0] = 1;
+        blocks1[1][1] = 3;
+        blocks2[0][0] = 2;
         blocks2[0][1] = 3;
         blocks2[1][0] = 1;
-        blocks2[1][1] = 2;
+        blocks2[1][1] = 0;
         Board board1 = new Board(blocks1), board2 = new Board(blocks2);
         if (board1.equals(board2)) {
             StdOut.print(1);
