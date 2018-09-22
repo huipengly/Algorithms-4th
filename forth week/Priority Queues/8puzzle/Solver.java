@@ -49,8 +49,10 @@ public class Solver {
     public Solver(
             Board initial) {                    // find a solution to the initial board (using the A* algorithm)
         SearchNode searchNode = new SearchNode(initial);        // 搜索节点初始化
+        SearchNode twinSearchNode = new SearchNode(initial.twin());
         MinPQ<SearchNode> searchNodeMinPQ = new MinPQ<>();      // 搜索节点优先队列，按优先级小的
-        while (!searchNode.board.isGoal()) {                    // 判断搜索节点是否找到解
+        MinPQ<SearchNode> twinSearchNodeMinPQ = new MinPQ<>();
+        while (!searchNode.board.isGoal() && !twinSearchNode.board.isGoal()) { // 判断搜索节点是否找到解
             for (Board board : searchNode.board.neighbors()) {  // 添加搜索节点的邻居到优先队列
                 /* 如果前一个节点为空节点，则添加所有的邻居节点 */
                 /* 如果邻居和当前搜索节点的前一个节点相同，则不添加。 题目中第一个优化项 */
@@ -59,12 +61,24 @@ public class Solver {
                 }
             }
             searchNode = searchNodeMinPQ.delMin();              // 将优先级最低的作为下一个搜索节点
+
+            for (Board board : twinSearchNode.board.neighbors()) {
+                if (twinSearchNode.pre == null || !board.equals(twinSearchNode.pre.board)) {
+                    twinSearchNodeMinPQ.insert(new SearchNode(board, twinSearchNode));
+                }
+            }
+            twinSearchNode = twinSearchNodeMinPQ.delMin();
         }
-        move = searchNode.getMove();
-        while (searchNode.pre != null) {                        // 记录搜索过程
-            solutions.push(searchNode.board);
-            searchNode = searchNode.pre;
+        if (!twinSearchNode.board.isGoal()) {
+            move = searchNode.getMove();
+            solutions.push(initial);
+            while (searchNode.pre != null) {                        // 记录搜索过程
+                solutions.push(searchNode.board);
+                searchNode = searchNode.pre;
+            }
         }
+        else
+            move = -1;
     }
 
     public boolean isSolvable() {               // is the initial board solvable?
@@ -81,7 +95,7 @@ public class Solver {
 
     public static void main(String[] args) {    // solve a slider puzzle (given below)
         // create initial board from file
-        In in = new In("puzzle4x4-31.txt");
+        In in = new In("puzzle04.txt");
         int n = in.readInt();
         int[][] blocks = new int[n][n];
         for (int i = 0; i < n; i++)
