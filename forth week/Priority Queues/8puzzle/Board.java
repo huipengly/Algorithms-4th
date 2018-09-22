@@ -122,7 +122,7 @@ public class Board {
         if (y == null) return false;
         if (y.getClass() != this.getClass()) return false;
         Board that = (Board) y;
-        // 这么判断对么？
+        // 这么判断对么？ 只能判断这几项啊，blocks是私有的，不能访问
         if (this.dimension() != that.dimension()) return false;
         if (this.hamming() != that.hamming()) return false;
         if (this.manhattan() != that.manhattan()) return false;
