@@ -2,7 +2,7 @@
  *  Name:           PointSet.java
  *  Date:           20180928
  *  Description:    暴力搜索方法求解问题
- *  author:         huipengly
+ *  Author:         huipengly
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.In;
