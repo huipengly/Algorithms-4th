@@ -16,6 +16,10 @@
 
     [Programming Assignment 4: 8 Puzzle](Part%20I/04%20forth%20week/Priority%20Queues/readme.md)
 
+5. fifth week
+
+    [Programming Assignment 5: Kd-Trees](Part%20I/05%20fifth%20week/Geometric%20Applications%20of%20BSTs/readme.md)
+    
 以上代码均100分，格式上可能不好看，但是都已实现功能，包括extra。
 
 PS：不是写java的，只是为了实现思想，代码写的比较差，看看就好。
