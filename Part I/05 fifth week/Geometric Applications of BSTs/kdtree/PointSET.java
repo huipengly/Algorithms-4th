@@ -74,6 +74,9 @@ public class PointSET {
 
     public static void main(
             String[] args) {                // unit testing of the methods (optional)
+        boolean testNearestNeighbor = false;
+        boolean testRangeSearch = true;
+
         // initialize the two data structures with point from file
         //String filename = args[0];
         In in = new In("horizontal8.txt");
@@ -84,38 +87,99 @@ public class PointSET {
             Point2D p = new Point2D(x, y);
             brute.insert(p);
         }
-        // process nearest neighbor queries
-        StdDraw.enableDoubleBuffering();
-        while (true) {
-            // the location (x, y) of the mouse
-            double x = StdDraw.mouseX();
-            double y = StdDraw.mouseY();
-            Point2D query = new Point2D(x, y);
-            Point2D testPoint = new Point2D(0.5, 0.55);
 
-            // draw all of the points
+        if (testNearestNeighbor) {
+            // process nearest neighbor queries
+            StdDraw.enableDoubleBuffering();
+            while (true) {
+                // the location (x, y) of the mouse
+                double x = StdDraw.mouseX();
+                double y = StdDraw.mouseY();
+                Point2D query = new Point2D(x, y);
+                Point2D testPoint = new Point2D(0.5, 0.55);
+
+                // draw all of the points
+                StdDraw.clear();
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.setPenRadius(0.01);
+                brute.draw();
+
+                // draw test point
+                StdDraw.setPenRadius(0.03);
+                StdDraw.setPenColor(StdDraw.CYAN);
+                StdDraw.point(query.x(), query.y());
+                // StdDraw.point(testPoint.x(), testPoint.y());
+
+                // draw in red the nearest neighbor (using brute-force algorithm)
+                StdDraw.setPenRadius(0.03);
+                StdDraw.setPenColor(StdDraw.RED);
+                brute.nearest(query).draw();
+                // brute.nearest(testPoint).draw();
+                StdDraw.setPenRadius(0.02);
+
+                // draw in blue the nearest neighbor (using kd-tree algorithm)
+                StdDraw.setPenColor(StdDraw.BLUE);
+                StdDraw.show();
+                StdDraw.pause(40);
+            }
+        }
+
+        if (testRangeSearch) {
+            double x0 = 0.0, y0 = 0.0;      // initial endpoint of rectangle
+            double x1 = 1.0, y1 = 1.0;      // current location of mouse
+            boolean isDragging = false;     // is the user dragging a rectangle
+
+            // draw the points
             StdDraw.clear();
             StdDraw.setPenColor(StdDraw.BLACK);
             StdDraw.setPenRadius(0.01);
             brute.draw();
-
-            // draw test point
-            StdDraw.setPenRadius(0.03);
-            StdDraw.setPenColor(StdDraw.CYAN);
-            StdDraw.point(query.x(), query.y());
-            // StdDraw.point(testPoint.x(), testPoint.y());
-
-            // draw in red the nearest neighbor (using brute-force algorithm)
-            StdDraw.setPenRadius(0.03);
-            StdDraw.setPenColor(StdDraw.RED);
-            brute.nearest(query).draw();
-            // brute.nearest(testPoint).draw();
-            StdDraw.setPenRadius(0.02);
-
-            // draw in blue the nearest neighbor (using kd-tree algorithm)
-            StdDraw.setPenColor(StdDraw.BLUE);
             StdDraw.show();
-            StdDraw.pause(40);
+
+            // process range search queries
+            StdDraw.enableDoubleBuffering();
+            while (true) {
+
+                // // user starts to drag a rectangle
+                // if (StdDraw.isMousePressed() && !isDragging) {
+                //     x0 = x1 = StdDraw.mouseX();
+                //     y0 = y1 = StdDraw.mouseY();
+                //     isDragging = true;
+                // }
+                //
+                // // user is dragging a rectangle
+                // else if (StdDraw.isMousePressed() && isDragging) {
+                //     x1 = StdDraw.mouseX();
+                //     y1 = StdDraw.mouseY();
+                // }
+                //
+                // // user stops dragging rectangle
+                // else if (!StdDraw.isMousePressed() && isDragging) {
+                //     isDragging = false;
+                // }
+
+                // draw the points
+                StdDraw.clear();
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.setPenRadius(0.01);
+                brute.draw();
+
+                // draw the rectangle
+                RectHV rect = new RectHV(Math.min(x0, x1), Math.min(y0, y1),
+                                         Math.max(x0, x1), Math.max(y0, y1));
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.setPenRadius();
+                rect.draw();
+
+                // draw the range search results for brute-force data structure in red
+                StdDraw.setPenRadius(0.03);
+                StdDraw.setPenColor(StdDraw.RED);
+                for (Point2D p : brute.range(rect))
+                    p.draw();
+
+                StdDraw.show();
+                StdDraw.pause(20);
+            }
         }
     }
 }
