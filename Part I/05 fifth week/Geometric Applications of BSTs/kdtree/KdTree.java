@@ -21,8 +21,9 @@ public class KdTree {
         private Node lb;            // the left/bottom subtree
         private Node rt;            // the right/top subtree
 
-        public Node(Point2D p) {
+        public Node(Point2D p, RectHV rect) {
             this.p = p;
+            this.rect = rect;
         }
     }
 
@@ -40,28 +41,28 @@ public class KdTree {
 
     public void insert(
             Point2D p) {                    // add the point to the set (if it is not already in the set)
-        root = insert(root, p, 0);
+        root = insert(root, p, 0, new RectHV(0, 0, 1, 1));
     }
 
     /* i % 2 表达横竖。0表示横，1表示竖 */
     // TODO: RectHV怎么更新
-    private Node insert(Node n, Point2D p, int i) {
+    private Node insert(Node n, Point2D p, int i, RectHV re) {
         if (n == null) {
             ++size;                     //添加了一个节点
-            return new Node(p);
+            return new Node(p, re);
         }
 
         if (i % 2 == horizon) {         // 横向节点比较y
             if (n.p.y() < p.y())        // p的y小，插入到左节点
-                n.lb = insert(n, p, i + 1);
+                n.lb = insert(n, p, i + 1, new RectHV(re.xmin(), re.ymin(), re.xmax(), n.p.y()));
             else if (n.p.y() > p.y())   // p的y大，插入到右节点
-                n.rt = insert(n, p, i + 1);
+                n.rt = insert(n, p, i + 1, new RectHV(re.xmin(), n.p.y(), re.xmax(), re.ymax()));
         }
         else if (i % 2 == vertical) {   // 纵向比较
             if (n.p.x() < p.x())        // p的x小，插入到左节点
-                n.lb = insert(n, p, i + 1);
+                n.lb = insert(n, p, i + 1, new RectHV(re.xmin(), re.ymin(), n.p.x(), re.ymax()));
             else if (n.p.x() > p.x())   // p的x大，插入到右节点
-                n.rt = insert(n, p, i + 1);
+                n.rt = insert(n, p, i + 1, new RectHV(n.p.y(), re.ymin(), re.xmax(), re.ymax()));
         }
         return n;
     }
