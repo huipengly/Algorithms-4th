@@ -5,16 +5,16 @@
 ### Part.1
 1. first week
 
-    [Programming Assignment 1: Percolation](first%20week/Union-Find/percolation)
+    [Programming Assignment 1: Percolation](Part%20I/01%20first%20week/Union-Find/percolation)
 2. second week
    
-    [Programming Assignment 2: Deques and Randomized Queues](second%20week/Elementary%20Sorts/README.MD)
+    [Programming Assignment 2: Deques and Randomized Queues](Part%20I/02%20second%20week/Elementary%20Sorts/README.MD)
 3. third week
    
-    [Programming Assignment 3: Pattern Recognition](third%20week/Megersort/README.MD)
+    [Programming Assignment 3: Pattern Recognition](Part%20I/03%20third%20week/Megersort/README.MD)
 4. forth week
 
-    [Programming Assignment 4: 8 Puzzle](forth%20week/Priority%20Queues/readme.md)
+    [Programming Assignment 4: 8 Puzzle](Part%20I/04%20forth%20week/Priority%20Queues/readme.md)
 
 以上代码均100分，格式上可能不好看，但是都已实现功能，包括extra。
 
