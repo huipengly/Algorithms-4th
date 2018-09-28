@@ -79,7 +79,7 @@ public class PointSET {
 
         // initialize the two data structures with point from file
         //String filename = args[0];
-        In in = new In("horizontal8.txt");
+        In in = new In("input10.txt");
         PointSET brute = new PointSET();
         while (!in.isEmpty()) {
             double x = in.readDouble();
@@ -140,23 +140,23 @@ public class PointSET {
             StdDraw.enableDoubleBuffering();
             while (true) {
 
-                // // user starts to drag a rectangle
-                // if (StdDraw.isMousePressed() && !isDragging) {
-                //     x0 = x1 = StdDraw.mouseX();
-                //     y0 = y1 = StdDraw.mouseY();
-                //     isDragging = true;
-                // }
-                //
-                // // user is dragging a rectangle
-                // else if (StdDraw.isMousePressed() && isDragging) {
-                //     x1 = StdDraw.mouseX();
-                //     y1 = StdDraw.mouseY();
-                // }
-                //
-                // // user stops dragging rectangle
-                // else if (!StdDraw.isMousePressed() && isDragging) {
-                //     isDragging = false;
-                // }
+                // user starts to drag a rectangle
+                if (StdDraw.isMousePressed() && !isDragging) {
+                    x0 = x1 = StdDraw.mouseX();
+                    y0 = y1 = StdDraw.mouseY();
+                    isDragging = true;
+                }
+
+                // user is dragging a rectangle
+                else if (StdDraw.isMousePressed() && isDragging) {
+                    x1 = StdDraw.mouseX();
+                    y1 = StdDraw.mouseY();
+                }
+
+                // user stops dragging rectangle
+                else if (!StdDraw.isMousePressed() && isDragging) {
+                    isDragging = false;
+                }
 
                 // draw the points
                 StdDraw.clear();
