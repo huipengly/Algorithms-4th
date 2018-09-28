@@ -64,8 +64,10 @@ public class PointSET {
         for (Point2D point : point2DTreeSet) {
             double distance = Math.sqrt(
                     Math.pow(point.x() - p.x(), 2) + Math.pow(point.y() - p.y(), 2));
-            if (distance < minDistance)
+            if (distance < minDistance) {
+                minDistance = distance;     // Hint: 更新最短距离啊！！
                 nearestPoint = point;
+            }
         }
         return nearestPoint;
     }
@@ -100,12 +102,14 @@ public class PointSET {
             // draw test point
             StdDraw.setPenRadius(0.03);
             StdDraw.setPenColor(StdDraw.CYAN);
-            StdDraw.point(testPoint.x(), testPoint.y());
+            StdDraw.point(query.x(), query.y());
+            // StdDraw.point(testPoint.x(), testPoint.y());
 
             // draw in red the nearest neighbor (using brute-force algorithm)
             StdDraw.setPenRadius(0.03);
             StdDraw.setPenColor(StdDraw.RED);
-            brute.nearest(testPoint).draw();
+            brute.nearest(query).draw();
+            // brute.nearest(testPoint).draw();
             StdDraw.setPenRadius(0.02);
 
             // draw in blue the nearest neighbor (using kd-tree algorithm)
