@@ -49,7 +49,7 @@ public class PointSET {
             RectHV rect) {                  // all points that are inside the rectangle (or on the boundary)
         Stack<Point2D> pointInRectangle = new Stack<>();
         for (Point2D p : point2DTreeSet) {
-            if (p.x() > rect.xmax() && p.x() < rect.xmax() &&
+            if (p.x() > rect.xmin() && p.x() < rect.xmax() &&
                     p.y() > rect.ymin() && p.y() < rect.ymax())
                 pointInRectangle.push(p);
         }
