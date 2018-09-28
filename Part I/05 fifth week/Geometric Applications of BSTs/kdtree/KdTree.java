@@ -44,28 +44,49 @@ public class KdTree {
     }
 
     /* i % 2 表达横竖。0表示横，1表示竖 */
+    // TODO: RectHV怎么更新
     private Node insert(Node n, Point2D p, int i) {
-        if (n == null)
+        if (n == null) {
+            ++size;                     //添加了一个节点
             return new Node(p);
-        else {
-            if (i % 2 == horizon) {         // 横向节点比较y
-                if (n.p.y() < p.y())        // p的y小，插入到左节点
-                    n.lb = insert(n, p, i + 1);
-                else if (n.p.y() > p.y())   // p的y大，插入到右节点
-                    n.rt = insert(n, p, i + 1);
-            }
-            else if (i % 2 == vertical) {   // 纵向比较
-                if (n.p.x() < p.x())        // p的x小，插入到左节点
-                    n.lb = insert(n, p, i + 1);
-                else if (n.p.x() > p.x())   // p的x大，插入到右节点
-                    n.rt = insert(n, p, i + 1);
-            }
+        }
+
+        if (i % 2 == horizon) {         // 横向节点比较y
+            if (n.p.y() < p.y())        // p的y小，插入到左节点
+                n.lb = insert(n, p, i + 1);
+            else if (n.p.y() > p.y())   // p的y大，插入到右节点
+                n.rt = insert(n, p, i + 1);
+        }
+        else if (i % 2 == vertical) {   // 纵向比较
+            if (n.p.x() < p.x())        // p的x小，插入到左节点
+                n.lb = insert(n, p, i + 1);
+            else if (n.p.x() > p.x())   // p的x大，插入到右节点
+                n.rt = insert(n, p, i + 1);
         }
         return n;
     }
 
     public boolean contains(Point2D p) {    // does the set contain point p?
-        return kdTree.contains(new Node(p));        // 新建一个包含p的Node
+        return contains(root, p, 0);
+    }
+
+    private boolean contains(Node n, Point2D p, int i) {
+        if (n == null)
+            return false;
+        switch (i % 2) {
+            case horizon:
+                if (n.p.y() < p.y()) return contains(n.lb, p, i + 1);
+                else if (n.p.y() > p.y()) return contains(n.rt, p, i + 1);
+                else return true;
+
+            case vertical:
+                if (n.p.x() < p.x()) return contains(n.lb, p, i + 1);
+                else if (n.p.x() > p.x()) return contains(n.rt, p, i + 1);
+                else return true;
+
+            default:    // 这种情况不可能出现，但是不写他就报返回值错误
+                return true;
+        }
     }
 
     public void draw() {                    // draw all points to standard draw
