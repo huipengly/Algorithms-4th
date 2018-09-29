@@ -191,6 +191,55 @@ public class KdTree {
 
     public Point2D nearest(
             Point2D p) {                    // a nearest neighbor in the set to point p; null if the set is empty
+        return nearest(p, root, 0);
+    }
+
+    private Point2D nearest(Point2D p, Node n, int i) {
+        double x = n.p.x();
+        double y = n.p.y();
+        Point2D ret = null;
+        double distance = Math.sqrt(Math.pow(p.x() - x, 2) + Math.pow(p.y() - y, 2));
+
+        switch (i % 2) {
+            case vertical:
+                // 先向点所在的区域寻找，如果找到未找到点，则再向另一个方向搜索。如果找到点，则另一个方向被剪枝。
+                // TODO:这个代码应该可以优化
+                if (p.x() < x) {
+                    ret = nearest(p, n.lb, i + 1);
+                    if (ret == null)
+                        ret = nearest(p, n.rt, i + 1);
+                    // return ret;
+                }
+                else {      // p.x() >= x
+                    ret = nearest(p, n.rt, i + 1);
+                    if (ret == null)
+                        ret = nearest(p, n.lb, i + 1);
+                    // return ret;
+                }
+                break;
+            case horizon:
+                if (p.y() < y) {
+                    ret = nearest(p, n.lb, i + 1);
+                    if (ret == null)
+                        ret = nearest(p, n.rt, i + 1);
+                    // return ret;
+                }
+                else {      // p.y() >= y
+                    ret = nearest(p, n.rt, i + 1);
+                    if (ret == null)
+                        ret = nearest(p, n.lb, i + 1);
+                    // return ret;
+                }
+                break;
+        }
+
+        if (ret != null) {
+            double retDistance = Math.sqrt(
+                    Math.pow(p.x() - ret.x(), 2) + Math.pow(p.y() - ret.y(), 2));
+            if (retDistance < distance)
+                return ret;
+        }
+        return n.p;
     }
 
     public static void main(
