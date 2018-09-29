@@ -95,15 +95,15 @@ public class KdTree {
             return false;
         switch (i % 2) {
             case vertical:
-                if (n.p.x() < p.x()) return contains(n.lb, p, i + 1);
-                else if (n.p.x() > p.x()) return contains(n.rt, p, i + 1);
-                else if (n.p.y() != p.y()) return contains(n.rt, p, i + 1);
+                if (n.p.x() < p.x()) return contains(n.rt, p, i + 1);
+                else if (n.p.x() > p.x()) return contains(n.lb, p, i + 1);
+                else if (n.p.y() != p.y()) return contains(n.lb, p, i + 1);
                 break;
 
             case horizon:
-                if (n.p.y() < p.y()) return contains(n.lb, p, i + 1);
-                else if (n.p.y() > p.y()) return contains(n.rt, p, i + 1);
-                else if (n.p.x() != p.x()) return contains(n.rt, p, i + 1);
+                if (n.p.y() < p.y()) return contains(n.rt, p, i + 1);
+                else if (n.p.y() > p.y()) return contains(n.lb, p, i + 1);
+                else if (n.p.x() != p.x()) return contains(n.lb, p, i + 1);
                 break;
         }
         return true;
@@ -204,8 +204,8 @@ public class KdTree {
 
         // 剪枝条件不是在一侧找到点，就剪掉另一侧。而是一侧点到点的最短距离，小于点到分割的矩形边的距离。
         // 跟rectangle比有可能会左右两边都不包括点，所以应该用线延长到边界，比左右/上下。
-        // 一、左边有子节点且左边包含了query点
-        if (n.lb != null && lowerSide(n.p, p, i)) {
+        // 一、1.右边节点为空，2.左边有子节点且左边包含了query点
+        if (n.rt == null || n.lb != null && lowerSide(n.p, p, i)) {
             nearestPoint = nearest(p, n.lb, i + 1);
             // 比较给定点到返回点和给定点点到边距离。点到点距离小才剪枝
             // 如果分割线是纵向，则距离为横向。如果分割线是横向，则距离为纵向
@@ -257,6 +257,8 @@ public class KdTree {
             kdTree.draw();
         }
 
+        // kdTree.contains(new Point2D(0.5, 0.4));
+
         if (testNearestNeighbor) {
             // process nearest neighbor queries
             StdDraw.enableDoubleBuffering();
@@ -265,7 +267,7 @@ public class KdTree {
                 double x = StdDraw.mouseX();
                 double y = StdDraw.mouseY();
                 // Point2D query = new Point2D(x, y);
-                Point2D testPoint = new Point2D(0.45, 0.7);
+                Point2D testPoint = new Point2D(0.913, 0.673);
 
                 // StdOut.print(testPoint.distanceTo(p1) + "\n");
                 // StdOut.print(testPoint.distanceTo(p2) + "\n");
