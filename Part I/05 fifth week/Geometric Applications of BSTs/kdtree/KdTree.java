@@ -5,6 +5,7 @@
  *  Author:         huipengly
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.Stack;
@@ -244,6 +245,112 @@ public class KdTree {
 
     public static void main(
             String[] args) {                // unit testing of the methods (optional)
+        boolean testNearestNeighbor = true;
+        boolean testRangeSearch = false;
 
+        // initialize the two data structures with point from file
+        //String filename = args[0];
+        In in = new In("input10.txt");
+        KdTree kdTree = new KdTree();
+        while (!in.isEmpty()) {
+            double x = in.readDouble();
+            double y = in.readDouble();
+            Point2D p = new Point2D(x, y);
+            kdTree.insert(p);
+        }
+
+        if (testNearestNeighbor) {
+            // process nearest neighbor queries
+            StdDraw.enableDoubleBuffering();
+            while (true) {
+                // the location (x, y) of the mouse
+                double x = StdDraw.mouseX();
+                double y = StdDraw.mouseY();
+                // Point2D query = new Point2D(x, y);
+                Point2D testPoint = new Point2D(0.5, 0.55);
+
+                // draw all of the points
+                StdDraw.clear();
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.setPenRadius(0.01);
+                kdTree.draw();
+
+                // draw test point
+                StdDraw.setPenRadius(0.03);
+                StdDraw.setPenColor(StdDraw.CYAN);
+                // StdDraw.point(query.x(), query.y());
+                StdDraw.point(testPoint.x(), testPoint.y());
+
+                // draw in red the nearest neighbor (using brute-force algorithm)
+                StdDraw.setPenRadius(0.03);
+                StdDraw.setPenColor(StdDraw.RED);
+                // kdTree.nearest(query).draw();
+                kdTree.nearest(testPoint).draw();
+                StdDraw.setPenRadius(0.02);
+
+                // draw in blue the nearest neighbor (using kd-tree algorithm)
+                StdDraw.setPenColor(StdDraw.BLUE);
+                StdDraw.show();
+                StdDraw.pause(40);
+            }
+        }
+
+        if (testRangeSearch) {
+            double x0 = 0.0, y0 = 0.0;      // initial endpoint of rectangle
+            double x1 = 1.0, y1 = 1.0;      // current location of mouse
+            boolean isDragging = false;     // is the user dragging a rectangle
+
+            // draw the points
+            StdDraw.clear();
+            StdDraw.setPenColor(StdDraw.BLACK);
+            StdDraw.setPenRadius(0.01);
+            kdTree.draw();
+            StdDraw.show();
+
+            // process range search queries
+            StdDraw.enableDoubleBuffering();
+            while (true) {
+
+                // user starts to drag a rectangle
+                if (StdDraw.isMousePressed() && !isDragging) {
+                    x0 = x1 = StdDraw.mouseX();
+                    y0 = y1 = StdDraw.mouseY();
+                    isDragging = true;
+                }
+
+                // user is dragging a rectangle
+                else if (StdDraw.isMousePressed() && isDragging) {
+                    x1 = StdDraw.mouseX();
+                    y1 = StdDraw.mouseY();
+                }
+
+                // user stops dragging rectangle
+                else if (!StdDraw.isMousePressed() && isDragging) {
+                    isDragging = false;
+                }
+
+                // draw the points
+                StdDraw.clear();
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.setPenRadius(0.01);
+                kdTree.draw();
+
+                // draw the rectangle
+                RectHV rect = new RectHV(Math.min(x0, x1), Math.min(y0, y1),
+                                         Math.max(x0, x1), Math.max(y0, y1));
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.setPenRadius();
+                rect.draw();
+
+                // draw the range search results for brute-force data structure in red
+                StdDraw.setPenRadius(0.03);
+                StdDraw.setPenColor(StdDraw.RED);
+                for (Point2D p : kdTree.range(rect))
+                    p.draw();
+
+                StdDraw.show();
+                StdDraw.pause(20);
+            }
+        }
     }
 }
