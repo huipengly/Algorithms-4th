@@ -43,6 +43,8 @@ public class KdTree {
 
     public void insert(
             Point2D p) {                    // add the point to the set (if it is not already in the set)
+        if (p == null)
+            throw new java.lang.IllegalArgumentException("point is null");
         root = insert(root, p, 0, new RectHV(0, 0, 1, 1));
     }
 
@@ -81,6 +83,8 @@ public class KdTree {
     }
 
     public boolean contains(Point2D p) {    // does the set contain point p?
+        if (p == null)
+            throw new java.lang.IllegalArgumentException("point is null");
         return contains(root, p, 0);
     }
 
@@ -110,7 +114,6 @@ public class KdTree {
     // 递归思想，先画左侧节点，然后画右侧节点。
     // 先一直向左走，走到子节点均为空的节点，画。然后返回，向这个节点父节点的右节点画，也是找到这个右节点中均为空的节点。然后画父节点，再返回继续画上面的父节点
     private void draw(Node n, int i) {
-
         if (n.lb != null)
             draw(n.lb, i + 1);
         if (n.rt != null)
@@ -135,6 +138,8 @@ public class KdTree {
 
     public Iterable<Point2D> range(
             RectHV rect) {                  // all points that are inside the rectangle (or on the boundary)
+        if (rect == null)
+            throw new java.lang.IllegalArgumentException("rectangle is null");
         Stack<Point2D> points = new Stack<>();
         range(points, root, rect, 0);
         return points;
@@ -175,6 +180,8 @@ public class KdTree {
 
     public Point2D nearest(
             Point2D p) {                    // a nearest neighbor in the set to point p; null if the set is empty
+        if (p == null)
+            throw new java.lang.IllegalArgumentException("point is null");
         return nearest(p, root, 0);
     }
 

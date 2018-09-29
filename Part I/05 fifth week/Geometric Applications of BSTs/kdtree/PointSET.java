@@ -30,10 +30,14 @@ public class PointSET {
 
     public void insert(
             Point2D p) {                    // add the point to the set (if it is not already in the set)
+        if (p == null)
+            throw new java.lang.IllegalArgumentException("point is null");
         point2DTreeSet.add(p);
     }
 
     public boolean contains(Point2D p) {    // does the set contain point p?
+        if (p == null)
+            throw new java.lang.IllegalArgumentException("point is null");
         return point2DTreeSet.contains(p);
     }
 
@@ -47,6 +51,8 @@ public class PointSET {
 
     public Iterable<Point2D> range(
             RectHV rect) {                  // all points that are inside the rectangle (or on the boundary)
+        if (rect == null)
+            throw new java.lang.IllegalArgumentException("rectangle is null");
         Stack<Point2D> pointInRectangle = new Stack<>();
         for (Point2D p : point2DTreeSet) {
             if (p.x() > rect.xmin() && p.x() < rect.xmax() &&
@@ -58,6 +64,8 @@ public class PointSET {
 
     public Point2D nearest(
             Point2D p) {                    // a nearest neighbor in the set to point p; null if the set is empty
+        if (p == null)
+            throw new java.lang.IllegalArgumentException("point is null");
         Point2D nearestPoint = point2DTreeSet.first();
         double minDistance = Math.sqrt(
                 Math.pow(nearestPoint.x() - p.x(), 2) + Math.pow(nearestPoint.y() - p.y(), 2));
