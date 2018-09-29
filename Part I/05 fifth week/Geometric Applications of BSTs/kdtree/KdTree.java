@@ -106,11 +106,39 @@ public class KdTree {
     }
 
     public void draw() {                    // draw all points to standard draw
-        StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(0.01);
-        for (Node n : kdTree) {
-            StdDraw.point(n.p.x(), n.p.y());
+        draw(root);
+    }
+
+    // 递归思想，先画左侧节点，然后画右侧节点。
+    // 先一直向左走，走到子节点均为空的节点，画。然后返回，向这个节点父节点的右节点画，也是找到这个右节点中均为空的节点。然后画父节点，再返回继续画上面的父节点
+    private void draw(Node n) {         // 不用判断节点方向，因为是要画整个矩形
+
+        if (n.lb != null)
+            draw(n.lb);
+        if (n.rt != null)
+            draw(n.rt);
+
+        // if (n.lb == null && n.rt == null) {
+        StdDraw.setPenRadius();
+        if (n.rect.ymin() != 0) {    // 判断矩形下边不在边界上
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.line(n.rect.xmin(), n.rect.ymin(), n.rect.xmax(), n.rect.ymin());
         }
+        if (n.rect.ymax() != 1) {   // 判断矩形上边不在边界上
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.line(n.rect.xmin(), n.rect.ymax(), n.rect.xmax(), n.rect.ymax());
+        }
+        if (n.rect.xmin() != 0) {   // 判断矩形左边不在边界上
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.line(n.rect.xmin(), n.rect.ymin(), n.rect.xmin(), n.rect.ymax());
+        }
+        if (n.rect.xmax() != 0) {   // 判断矩形右边不在边界上
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.line(n.rect.xmax(), n.rect.ymin(), n.rect.xmax(), n.rect.ymax());
+        }
+
+        //     return;
+        // }
     }
 
     public Iterable<Point2D> range(
