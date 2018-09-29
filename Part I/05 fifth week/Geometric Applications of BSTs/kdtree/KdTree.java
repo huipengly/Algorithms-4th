@@ -252,13 +252,13 @@ public class KdTree {
 
         if (testNearestNeighbor) {
             // process nearest neighbor queries
-            // StdDraw.enableDoubleBuffering();
+            StdDraw.enableDoubleBuffering();
             while (true) {
                 // the location (x, y) of the mouse
                 double x = StdDraw.mouseX();
                 double y = StdDraw.mouseY();
-                // Point2D query = new Point2D(x, y);
-                Point2D testPoint = new Point2D(0.1, 0.1);
+                Point2D query = new Point2D(x, y);
+                // Point2D testPoint = new Point2D(0.1, 0.1);
 
                 // draw all of the points
                 StdDraw.clear();
@@ -266,21 +266,21 @@ public class KdTree {
                 StdDraw.setPenRadius(0.01);
                 kdTree.draw();
 
-                // // draw test point
-                // StdDraw.setPenRadius(0.03);
-                // StdDraw.setPenColor(StdDraw.CYAN);
-                // // StdDraw.point(query.x(), query.y());
+                // draw test point
+                StdDraw.setPenRadius(0.03);
+                StdDraw.setPenColor(StdDraw.CYAN);
+                StdDraw.point(query.x(), query.y());
                 // StdDraw.point(testPoint.x(), testPoint.y());
-                //
-                // // draw in red the nearest neighbor (using brute-force algorithm)
-                // StdDraw.setPenRadius(0.03);
-                // StdDraw.setPenColor(StdDraw.RED);
-                // // kdTree.nearest(query).draw();
+
+                // draw in red the nearest neighbor (using brute-force algorithm)
+                StdDraw.setPenRadius(0.03);
+                StdDraw.setPenColor(StdDraw.RED);
+                kdTree.nearest(query).draw();
                 // kdTree.nearest(testPoint).draw();
-                // StdDraw.setPenRadius(0.02);
-                //
-                // // draw in blue the nearest neighbor (using kd-tree algorithm)
-                // StdDraw.setPenColor(StdDraw.BLUE);
+                StdDraw.setPenRadius(0.02);
+
+                // draw in blue the nearest neighbor (using kd-tree algorithm)
+                StdDraw.setPenColor(StdDraw.BLUE);
                 StdDraw.show();
                 StdDraw.pause(40);
             }
