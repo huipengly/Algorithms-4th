@@ -7,6 +7,7 @@
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdDraw;
 
 public class KdTree {
@@ -96,11 +97,13 @@ public class KdTree {
                 if (n.p.x() < p.x()) return contains(n.lb, p, i + 1);
                 else if (n.p.x() > p.x()) return contains(n.rt, p, i + 1);
                 else if (n.p.y() != p.y()) return contains(n.rt, p, i + 1);
+                break;
 
             case horizon:
                 if (n.p.y() < p.y()) return contains(n.lb, p, i + 1);
                 else if (n.p.y() > p.y()) return contains(n.rt, p, i + 1);
                 else if (n.p.x() != p.x()) return contains(n.rt, p, i + 1);
+                break;
         }
         return true;
     }
@@ -143,6 +146,47 @@ public class KdTree {
 
     public Iterable<Point2D> range(
             RectHV rect) {                  // all points that are inside the rectangle (or on the boundary)
+        Stack<Point2D> points = new Stack<>();
+        range(points, root, rect, 0);
+        return points;
+    }
+
+    private void range(Stack<Point2D> point2DStack, Node n, RectHV rect, int i) {
+        if (n.rect.xmin() > rect.xmax() ||
+                n.rect.xmax() < rect.xmin() ||
+                n.rect.ymin() > rect.ymax() ||
+                n.rect.ymax() < rect.xmin())    // range的矩形不在node的包含中
+            return;
+        double x = n.p.x();
+        double y = n.p.y();
+        int counter = 0;        // 用来记录满足几个边的条件
+
+        switch (i % 2) {
+            case vertical:
+                if (rect.xmin() < x) {
+                    range(point2DStack, n.lb, rect, i + 1);
+                    ++counter;
+                }
+                if (rect.xmax() > x) {
+                    range(point2DStack, n.rt, rect, i + 1);
+                    ++counter;
+                }
+                break;
+
+            case horizon:
+                if (rect.ymin() < y) {
+                    range(point2DStack, n.lb, rect, i + 1);
+                    ++counter;
+                }
+                if (rect.ymax() > y) {
+                    range(point2DStack, n.rt, rect, i + 1);
+                    ++counter;
+                }
+                break;
+        }
+
+        if (counter == 4)   // counter等于4说明当前点在范围内
+            point2DStack.push(n.p);
     }
 
     public Point2D nearest(
