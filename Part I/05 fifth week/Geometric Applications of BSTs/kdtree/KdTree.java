@@ -64,7 +64,8 @@ public class KdTree {
                     n.lb = insert(n.lb, p, i + 1,
                                   new RectHV(re.xmin(), re.ymin(), x, re.ymax()));
                 }
-                else if (p.x() >= x && p.y() != y) {     // p的x大，或p在分割线上，插入到右节点。忽略相同的节点
+                else if (p.x() > x ||
+                        (p.x() == x && p.y() != y)) {     // p的x大，或p在分割线上，插入到右节点。忽略相同的节点
                     n.rt = insert(n.rt, p, i + 1,
                                   new RectHV(x, re.ymin(), re.xmax(), re.ymax()));
                 }
@@ -74,7 +75,8 @@ public class KdTree {
                 if (p.y() < y)      // p的y小，插入到左节点
                     n.lb = insert(n.lb, p, i + 1,
                                   new RectHV(re.xmin(), re.ymin(), re.xmax(), y));
-                else if (p.y() >= y && p.x() != x)      // p的y大，或p在分割线上，插入到右节点。忽略相同的节点
+                else if (p.y() > y ||
+                        (p.y() == y && p.x() != x))      // p的y大，或p在分割线上，插入到右节点。忽略相同的节点
                     n.rt = insert(n.rt, p, i + 1,
                                   new RectHV(re.xmin(), y, re.xmax(), re.ymax()));
                 break;
@@ -173,8 +175,7 @@ public class KdTree {
                 break;
         }
 
-        if ((rect.xmin() < x) && (rect.xmax() > x) &&
-                (rect.ymin() < y) && (rect.ymax() > y))   // 当前节点在range的矩形内
+        if (rect.contains(n.p))   // 当前节点在range的矩形内
             point2DStack.push(n.p);
     }
 
@@ -192,7 +193,7 @@ public class KdTree {
         double x = n.p.x();
         double y = n.p.y();
         Point2D ret = null;
-        double distance = Math.sqrt(Math.pow(p.x() - x, 2) + Math.pow(p.y() - y, 2));
+        double distance = n.p.distanceTo(p);
 
         switch (i % 2) {
             case vertical:
@@ -228,8 +229,7 @@ public class KdTree {
         }
 
         if (ret != null) {
-            double retDistance = Math.sqrt(
-                    Math.pow(p.x() - ret.x(), 2) + Math.pow(p.y() - ret.y(), 2));
+            double retDistance = ret.distanceTo(p);
             if (retDistance < distance)
                 return ret;
         }
@@ -250,11 +250,12 @@ public class KdTree {
             double y = in.readDouble();
             Point2D p = new Point2D(x, y);
             kdTree.insert(p);
+            kdTree.draw();
         }
 
         if (testNearestNeighbor) {
             // process nearest neighbor queries
-            StdDraw.enableDoubleBuffering();
+            // StdDraw.enableDoubleBuffering();
             while (true) {
                 // the location (x, y) of the mouse
                 double x = StdDraw.mouseX();
