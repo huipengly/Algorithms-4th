@@ -64,7 +64,7 @@ public class KdTree {
                 }
                 else if (p.x() >= x && p.y() != y) {     // p的x大，或p在分割线上，插入到右节点。忽略相同的节点
                     n.rt = insert(n.rt, p, i + 1,
-                                  new RectHV(y, re.ymin(), re.xmax(), re.ymax()));
+                                  new RectHV(x, re.ymin(), re.xmax(), re.ymax()));
                 }
                 break;
 
