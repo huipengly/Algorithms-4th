@@ -141,6 +141,9 @@ public class KdTree {
     }
 
     private void range(Stack<Point2D> point2DStack, Node n, RectHV rect, int i) {
+        if (n == null)      // 记得判断空节点
+            return;
+
         if (n.rect.xmin() > rect.xmax() ||
                 n.rect.xmax() < rect.xmin() ||
                 n.rect.ymin() > rect.ymax() ||
@@ -148,33 +151,25 @@ public class KdTree {
             return;
         double x = n.p.x();
         double y = n.p.y();
-        int counter = 0;        // 用来记录满足几个边的条件
 
         switch (i % 2) {
             case vertical:
-                if (rect.xmin() < x) {
+                if (rect.xmin() < x)
                     range(point2DStack, n.lb, rect, i + 1);
-                    ++counter;
-                }
-                if (rect.xmax() > x) {
+                if (rect.xmax() > x)
                     range(point2DStack, n.rt, rect, i + 1);
-                    ++counter;
-                }
                 break;
 
             case horizon:
-                if (rect.ymin() < y) {
+                if (rect.ymin() < y)
                     range(point2DStack, n.lb, rect, i + 1);
-                    ++counter;
-                }
-                if (rect.ymax() > y) {
+                if (rect.ymax() > y)
                     range(point2DStack, n.rt, rect, i + 1);
-                    ++counter;
-                }
                 break;
         }
 
-        if (counter == 4)   // counter等于4说明当前点在范围内
+        if ((rect.xmin() < x) && (rect.xmax() > x) &&
+                (rect.ymin() < y) && (rect.ymax() > y))   // 当前节点在range的矩形内
             point2DStack.push(n.p);
     }
 
@@ -236,8 +231,8 @@ public class KdTree {
 
     public static void main(
             String[] args) {                // unit testing of the methods (optional)
-        boolean testNearestNeighbor = true;
-        boolean testRangeSearch = false;
+        boolean testNearestNeighbor = false;
+        boolean testRangeSearch = true;
 
         // initialize the two data structures with point from file
         //String filename = args[0];
