@@ -170,60 +170,80 @@ public class KdTree {
         return nearest(p, root, 0);
     }
 
+    // np是指节点的point，p是query点，i用来记录方向
+    private boolean lowerSide(Point2D np, Point2D p, int i) {
+        switch (i % 2) {
+            case vertical:  // 垂直分割
+                return np.x() > p.x();
+            default:        // 横向分割
+                return np.y() > p.y();
+        }
+    }
+
+    private boolean higherSide(Point2D np, Point2D p, int i) {
+        return !lowerSide(np, p, i);
+    }
+
+    private double distanceToRect(Point2D np, Point2D p, int i) {
+        switch (i % 2) {
+            case vertical:
+                return p.distanceTo(new Point2D(np.x(), p.y()));
+            default:
+                return p.distanceTo(new Point2D(p.x(), np.y()));
+        }
+    }
+
     private Point2D nearest(Point2D p, Node n, int i) {
         if (n == null)      // 判断节点是否为空
             return null;
 
         double x = n.p.x();
         double y = n.p.y();
-        Point2D ret = null;
+        Point2D nearestPoint = null;
         double distance = n.p.distanceTo(p);
 
-        switch (i % 2) {
-            case vertical:
-                // 先向点所在的区域寻找，如果找到未找到点，则再向另一个方向搜索。如果找到点，则另一个方向被剪枝。
-                // TODO:这个代码应该可以优化
-                if (p.x() < x) {
-                    ret = nearest(p, n.lb, i + 1);
-                    if (ret == null)
-                        ret = nearest(p, n.rt, i + 1);
-                    // return ret;
-                }
-                else {      // p.x() >= x
-                    ret = nearest(p, n.rt, i + 1);
-                    if (ret == null)
-                        ret = nearest(p, n.lb, i + 1);
-                    // return ret;
-                }
-                break;
-            case horizon:
-                if (p.y() < y) {
-                    ret = nearest(p, n.lb, i + 1);
-                    if (ret == null)
-                        ret = nearest(p, n.rt, i + 1);
-                    // return ret;
-                }
-                else {      // p.y() >= y
-                    ret = nearest(p, n.rt, i + 1);
-                    if (ret == null)
-                        ret = nearest(p, n.lb, i + 1);
-                    // return ret;
-                }
-                break;
+        // 剪枝条件不是在一侧找到点，就剪掉另一侧。而是一侧点到点的最短距离，小于点到分割的矩形边的距离。
+        // 跟rectangle比有可能会左右两边都不包括点，所以应该用线延长到边界，比左右/上下。
+        // 一、左边有子节点且左边包含了query点
+        if (n.lb != null && lowerSide(n.p, p, i)) {
+            nearestPoint = nearest(p, n.lb, i + 1);
+            // 比较给定点到返回点和给定点点到边距离。点到点距离小才剪枝
+            // 如果分割线是纵向，则距离为横向。如果分割线是横向，则距离为纵向
+            if (n.rt != null && p.distanceTo(nearestPoint) > distanceToRect(n.p, p, i)) {
+                Point2D tempNearestPoint = nearest(p, n.rt, i + 1);
+                if (tempNearestPoint != null &&
+                        p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
+                    nearestPoint = tempNearestPoint;
+            }
+        }
+        // 二、1. 左边包含了，但是左边没有子节点； 2. 左边没有包含
+        else if (n.rt != null) { // && higherSide(n.p, p, i)) {
+            nearestPoint = nearest(p, n.rt, i + 1);
+            if (n.lb != null && p.distanceTo(nearestPoint) > distanceToRect(n.p, p, i)) {
+                Point2D tempNearestPoint = nearest(p, n.lb, i + 1);
+                if (tempNearestPoint != null &&
+                        p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
+                    nearestPoint = tempNearestPoint;
+            }
         }
 
-        if (ret != null) {
-            double retDistance = ret.distanceTo(p);
+        if (nearestPoint != null) {
+            double retDistance = nearestPoint.distanceTo(p);
             if (retDistance < distance)
-                return ret;
+                return nearestPoint;
         }
         return n.p;
     }
 
     public static void main(
             String[] args) {                // unit testing of the methods (optional)
-        boolean testNearestNeighbor = false;
-        boolean testRangeSearch = true;
+        boolean testNearestNeighbor = true;
+        boolean testRangeSearch = false;
+
+        Point2D p1 = new Point2D(0.206107, 0.904508);
+        Point2D p2 = new Point2D(0.5, 1);
+        // 0.206107 0.904508
+        // 0.5 1
 
         // initialize the two data structures with point from file
         //String filename = args[0];
@@ -239,13 +259,16 @@ public class KdTree {
 
         if (testNearestNeighbor) {
             // process nearest neighbor queries
-            // StdDraw.enableDoubleBuffering();
+            StdDraw.enableDoubleBuffering();
             while (true) {
                 // the location (x, y) of the mouse
                 double x = StdDraw.mouseX();
                 double y = StdDraw.mouseY();
-                Point2D query = new Point2D(x, y);
-                // Point2D testPoint = new Point2D(0.1, 0.1);
+                // Point2D query = new Point2D(x, y);
+                Point2D testPoint = new Point2D(0.45, 0.7);
+
+                // StdOut.print(testPoint.distanceTo(p1) + "\n");
+                // StdOut.print(testPoint.distanceTo(p2) + "\n");
 
                 // draw all of the points
                 StdDraw.clear();
@@ -256,14 +279,14 @@ public class KdTree {
                 // draw test point
                 StdDraw.setPenRadius(0.03);
                 StdDraw.setPenColor(StdDraw.CYAN);
-                StdDraw.point(query.x(), query.y());
-                // StdDraw.point(testPoint.x(), testPoint.y());
+                // StdDraw.point(query.x(), query.y());
+                StdDraw.point(testPoint.x(), testPoint.y());
 
                 // draw in red the nearest neighbor (using brute-force algorithm)
                 StdDraw.setPenRadius(0.03);
                 StdDraw.setPenColor(StdDraw.RED);
-                kdTree.nearest(query).draw();
-                // kdTree.nearest(testPoint).draw();
+                // kdTree.nearest(query).draw();
+                kdTree.nearest(testPoint).draw();
                 StdDraw.setPenRadius(0.02);
 
                 // draw in blue the nearest neighbor (using kd-tree algorithm)
