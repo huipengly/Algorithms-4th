@@ -12,8 +12,8 @@ import edu.princeton.cs.algs4.StdDraw;
 public class KdTree {
     private Node root;
     private int size = 0;
-    private final int horizon = 0;
-    private final int vertical = 1;
+    private final int horizon = 1;
+    private final int vertical = 0;
 
     private class Node {
         private Point2D p;          // the point
@@ -45,24 +45,41 @@ public class KdTree {
     }
 
     /* i % 2 表达横竖。0表示横，1表示竖 */
-    // TODO: RectHV怎么更新
     private Node insert(Node n, Point2D p, int i, RectHV re) {
         if (n == null) {
             ++size;                     //添加了一个节点
             return new Node(p, re);
         }
 
-        if (i % 2 == horizon) {         // 横向节点比较y
-            if (n.p.y() < p.y())        // p的y小，插入到左节点
-                n.lb = insert(n, p, i + 1, new RectHV(re.xmin(), re.ymin(), re.xmax(), n.p.y()));
-            else if (n.p.y() > p.y())   // p的y大，插入到右节点
-                n.rt = insert(n, p, i + 1, new RectHV(re.xmin(), n.p.y(), re.xmax(), re.ymax()));
-        }
-        else if (i % 2 == vertical) {   // 纵向比较
-            if (n.p.x() < p.x())        // p的x小，插入到左节点
-                n.lb = insert(n, p, i + 1, new RectHV(re.xmin(), re.ymin(), n.p.x(), re.ymax()));
-            else if (n.p.x() > p.x())   // p的x大，插入到右节点
-                n.rt = insert(n, p, i + 1, new RectHV(n.p.y(), re.ymin(), re.xmax(), re.ymax()));
+        switch (i % 2) {
+            case vertical:          // 纵向比较
+                if (n.p.x() < p.x()) {          // p的x小，插入到左节点
+                    n.lb = insert(n, p, i + 1,
+                                  new RectHV(re.xmin(), re.ymin(), n.p.x(), re.ymax()));
+                }
+                else if (n.p.x() > p.x()) {     // p的x大，插入到右节点
+                    n.rt = insert(n, p, i + 1,
+                                  new RectHV(n.p.y(), re.ymin(), re.xmax(), re.ymax()));
+                }
+                else if (n.p.y() != p.y()) {    // 相当于在分割线上，这种情况认为在分割线上侧
+                    n.rt = insert(n, p, i + 1,
+                                  new RectHV(n.p.y(), re.ymin(), re.xmax(), re.ymax()));
+                }
+                // else if (n.p.y() == p.y()) {  // 相同节点忽略
+                break;
+
+            case horizon:           // 横向节点比较y
+                if (n.p.y() < p.y())        // p的y小，插入到左节点
+                    n.lb = insert(n, p, i + 1,
+                                  new RectHV(re.xmin(), re.ymin(), re.xmax(), n.p.y()));
+                else if (n.p.y() > p.y())   // p的y大，插入到右节点
+                    n.rt = insert(n, p, i + 1,
+                                  new RectHV(re.xmin(), n.p.y(), re.xmax(), re.ymax()));
+                else if (n.p.x() != p.x())   // 相当于在分割线上，这种情况认为在分割线右侧
+                    n.rt = insert(n, p, i + 1,
+                                  new RectHV(re.xmin(), n.p.y(), re.xmax(), re.ymax()));
+                // 相同的节点忽略
+                break;
         }
         return n;
     }
@@ -75,19 +92,17 @@ public class KdTree {
         if (n == null)
             return false;
         switch (i % 2) {
-            case horizon:
-                if (n.p.y() < p.y()) return contains(n.lb, p, i + 1);
-                else if (n.p.y() > p.y()) return contains(n.rt, p, i + 1);
-                else return true;
-
             case vertical:
                 if (n.p.x() < p.x()) return contains(n.lb, p, i + 1);
                 else if (n.p.x() > p.x()) return contains(n.rt, p, i + 1);
-                else return true;
+                else if (n.p.y() != p.y()) return contains(n.rt, p, i + 1);
 
-            default:    // 这种情况不可能出现，但是不写他就报返回值错误
-                return true;
+            case horizon:
+                if (n.p.y() < p.y()) return contains(n.lb, p, i + 1);
+                else if (n.p.y() > p.y()) return contains(n.rt, p, i + 1);
+                else if (n.p.x() != p.x()) return contains(n.rt, p, i + 1);
         }
+        return true;
     }
 
     public void draw() {                    // draw all points to standard draw
