@@ -53,34 +53,28 @@ public class KdTree {
             return new Node(p, re);
         }
 
+        double x = n.p.x();
+        double y = n.p.y();
+
         switch (i % 2) {
             case vertical:          // 纵向比较
-                if (n.p.x() < p.x()) {          // p的x小，插入到左节点
+                if (p.x() < x) {    // p的x小，插入到左节点
                     n.lb = insert(n.lb, p, i + 1,
-                                  new RectHV(re.xmin(), re.ymin(), n.p.x(), re.ymax()));
+                                  new RectHV(re.xmin(), re.ymin(), x, re.ymax()));
                 }
-                else if (n.p.x() > p.x()) {     // p的x大，插入到右节点
+                else if (p.x() >= x && p.y() != y) {     // p的x大，或p在分割线上，插入到右节点。忽略相同的节点
                     n.rt = insert(n.rt, p, i + 1,
-                                  new RectHV(n.p.y(), re.ymin(), re.xmax(), re.ymax()));
+                                  new RectHV(y, re.ymin(), re.xmax(), re.ymax()));
                 }
-                else if (n.p.y() != p.y()) {    // 相当于在分割线上，这种情况认为在分割线右侧
-                    n.rt = insert(n.rt, p, i + 1,
-                                  new RectHV(n.p.y(), re.ymin(), re.xmax(), re.ymax()));
-                }
-                // else if (n.p.y() == p.y()) {  // 相同节点忽略
                 break;
 
             case horizon:           // 横向节点比较y
-                if (n.p.y() < p.y())        // p的y小，插入到左节点
+                if (p.y() < y)      // p的y小，插入到左节点
                     n.lb = insert(n.lb, p, i + 1,
-                                  new RectHV(re.xmin(), re.ymin(), re.xmax(), n.p.y()));
-                else if (n.p.y() > p.y())   // p的y大，插入到右节点
+                                  new RectHV(re.xmin(), re.ymin(), re.xmax(), y));
+                else if (p.y() >= y && p.x() != x)      // p的y大，或p在分割线上，插入到右节点。忽略相同的节点
                     n.rt = insert(n.rt, p, i + 1,
-                                  new RectHV(re.xmin(), n.p.y(), re.xmax(), re.ymax()));
-                else if (n.p.x() != p.x())   // 相当于在分割线上，这种情况认为在分割线上侧
-                    n.rt = insert(n.rt, p, i + 1,
-                                  new RectHV(re.xmin(), n.p.y(), re.xmax(), re.ymax()));
-                // 相同的节点忽略
+                                  new RectHV(re.xmin(), y, re.xmax(), re.ymax()));
                 break;
         }
         return n;
@@ -196,6 +190,9 @@ public class KdTree {
     }
 
     private Point2D nearest(Point2D p, Node n, int i) {
+        if (n == null)      // 判断节点是否为空
+            return null;
+
         double x = n.p.x();
         double y = n.p.y();
         Point2D ret = null;
@@ -250,7 +247,7 @@ public class KdTree {
 
         // initialize the two data structures with point from file
         //String filename = args[0];
-        In in = new In("input10.txt");
+        In in = new In("point.txt");
         KdTree kdTree = new KdTree();
         while (!in.isEmpty()) {
             double x = in.readDouble();
@@ -267,7 +264,7 @@ public class KdTree {
                 double x = StdDraw.mouseX();
                 double y = StdDraw.mouseY();
                 // Point2D query = new Point2D(x, y);
-                Point2D testPoint = new Point2D(0.5, 0.55);
+                Point2D testPoint = new Point2D(0.1, 0.1);
 
                 // draw all of the points
                 StdDraw.clear();
