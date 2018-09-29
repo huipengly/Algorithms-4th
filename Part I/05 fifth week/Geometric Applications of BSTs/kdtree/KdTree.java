@@ -143,37 +143,21 @@ public class KdTree {
         if (rect == null)
             throw new java.lang.IllegalArgumentException("rectangle is null");
         Stack<Point2D> points = new Stack<>();
-        range(points, root, rect, 0);
+        range(points, root, rect);
         return points;
     }
 
-    private void range(Stack<Point2D> point2DStack, Node n, RectHV rect, int i) {
+    private void range(Stack<Point2D> point2DStack, Node n, RectHV rect) {
         if (n == null)      // 记得判断空节点
             return;
 
-        if (n.rect.xmin() > rect.xmax() ||
-                n.rect.xmax() < rect.xmin() ||
-                n.rect.ymin() > rect.ymax() ||
-                n.rect.ymax() < rect.xmin())    // range的矩形不在node的包含中
+        if (!n.rect.intersects(rect))    // range的矩形不在node的包含中
             return;
-        double x = n.p.x();
-        double y = n.p.y();
 
-        switch (i % 2) {
-            case vertical:
-                if (rect.xmin() < x)
-                    range(point2DStack, n.lb, rect, i + 1);
-                if (rect.xmax() > x)
-                    range(point2DStack, n.rt, rect, i + 1);
-                break;
-
-            case horizon:
-                if (rect.ymin() < y)
-                    range(point2DStack, n.lb, rect, i + 1);
-                if (rect.ymax() > y)
-                    range(point2DStack, n.rt, rect, i + 1);
-                break;
-        }
+        if (n.lb != null && rect.intersects(n.lb.rect))     // 如果和左/下边矩形相交
+            range(point2DStack, n.lb, rect);
+        if (n.rt != null && rect.intersects(n.rt.rect))     // 如果和右/上边矩形相交
+            range(point2DStack, n.rt, rect);
 
         if (rect.contains(n.p))   // 当前节点在range的矩形内
             point2DStack.push(n.p);
