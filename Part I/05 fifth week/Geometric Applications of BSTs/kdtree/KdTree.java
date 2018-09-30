@@ -200,44 +200,18 @@ public class KdTree {
         return nearest(p, root.p, root, 0);
     }
 
-    // np是指节点的point，p是query点，i用来记录方向
-    private boolean lowerSide(Point2D np, Point2D p, int i) {
-        switch (i % 2) {
-            case vertical:  // 垂直分割
-                return np.x() > p.x();
-            default:        // 横向分割
-                return np.y() > p.y();
-        }
-    }
-
-    private boolean higherSide(Point2D np, Point2D p, int i) {
-        return !lowerSide(np, p, i);
-    }
-
-    private double distanceToRect(Point2D np, Point2D p, int i) {
-        switch (i % 2) {
-            case vertical:
-                return p.distanceTo(new Point2D(np.x(), p.y()));
-            default:
-                return p.distanceTo(new Point2D(p.x(), np.y()));
-        }
-    }
-
     private int compare(Point2D p1, Point2D query, int i) {
+        if (p1.equals(query)) return 0;
         switch (i % 2) {
             case vertical:
                 return query.x() < p1.x() ? -1 : 1;
-            case horizon:
+            default:
                 return query.y() < p1.y() ? -1 : 1;
         }
-        return 0;
+        // return 0;
     }
 
     private Point2D nearest(Point2D p, Point2D nearestPoint, Node n, int i) {
-
-        // double x = n.p.x();
-        // double y = n.p.y();
-
         double nearestDistance = p.distanceTo(nearestPoint);      // 当前最短距离
         double distanceToNode = p.distanceTo(n.p);
         if (distanceToNode < nearestDistance) {                 // 比较当前点距离和最短距离
@@ -245,7 +219,7 @@ public class KdTree {
             nearestDistance = distanceToNode;
         }
 
-        int cmp = compare(n.p, p, i);           // 判断在那边包含
+        int cmp = compare(n.p, p, i);           // 判断在哪边包含
 
         if (cmp < 0) {
             if (n.lb != null) {
@@ -255,7 +229,6 @@ public class KdTree {
             if (n.rt != null) {
                 if (nearestDistance > n.rt.rect.distanceTo(p)) {
                     nearestPoint = nearest(p, nearestPoint, n.rt, i + 1);
-                    // nearestDistance = p.distanceTo(nearestPoint);
                 }
             }
         }
@@ -267,7 +240,6 @@ public class KdTree {
             if (n.lb != null) {
                 if (nearestDistance > n.lb.rect.distanceTo(p)) {
                     nearestPoint = nearest(p, nearestPoint, n.lb, i + 1);
-                    // nearestDistance = p.distanceTo(nearestPoint);
                 }
             }
         }
