@@ -136,6 +136,8 @@ public class KdTree {
     }
 
     public void draw() {                    // draw all points to standard draw
+        if (isEmpty())
+            return;
         draw(root, 0);
     }
 
@@ -193,7 +195,9 @@ public class KdTree {
             Point2D p) {                    // a nearest neighbor in the set to point p; null if the set is empty
         if (p == null)
             throw new java.lang.IllegalArgumentException("point is null");
-        return nearest(p, root, 0);
+        if (isEmpty())
+            return null;
+        return nearest(p, root.p, root, 0);
     }
 
     // np是指节点的point，p是query点，i用来记录方向
@@ -229,77 +233,46 @@ public class KdTree {
         return 0;
     }
 
-    private Point2D nearest(Point2D p, Node n, int i) {
-        if (n == null)      // 判断节点是否为空
-            return null;
+    private Point2D nearest(Point2D p, Point2D nearestPoint, Node n, int i) {
 
         // double x = n.p.x();
         // double y = n.p.y();
-        Point2D nearestPoint = null;
-        double distance = n.p.distanceTo(p);
 
-        int cmp = compare(n.p, p, i);   // 判断在分割线的方位
+        double nearestDistance = p.distanceTo(nearestPoint);      // 当前最短距离
+        double distanceToNode = p.distanceTo(n.p);
+        if (distanceToNode < nearestDistance) {                 // 比较当前点距离和最短距离
+            nearestPoint = n.p;
+            nearestDistance = distanceToNode;
+        }
+
+        int cmp = compare(n.p, p, i);           // 判断在那边包含
 
         if (cmp < 0) {
-            if (n.lb != null)
-                nearestPoint = nearest(p, n.lb, i + 1);
-            if (nearestPoint == null)
-                nearestPoint = nearest(p, n.rt, i + 1);
-            else if (n.rt != null && nearestPoint.distanceTo(p) > n.rt.rect.distanceTo(p)) {
-                Point2D tempNearestPoint = nearest(p, n.rt, i + 1);
-                if (tempNearestPoint != null &&
-                        p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
-                    nearestPoint = tempNearestPoint;
+            if (n.lb != null) {
+                nearestPoint = nearest(p, nearestPoint, n.lb, i + 1);
+                nearestDistance = p.distanceTo(nearestPoint);
+            }
+            if (n.rt != null) {
+                if (nearestDistance > n.rt.rect.distanceTo(p)) {
+                    nearestPoint = nearest(p, nearestPoint, n.rt, i + 1);
+                    // nearestDistance = p.distanceTo(nearestPoint);
+                }
             }
         }
         else {
-            if (n.rt != null)
-                nearestPoint = nearest(p, n.rt, i + 1);
-            if (nearestPoint == null)
-                nearestPoint = nearest(p, n.lb, i + 1);
-            else if (n.lb != null && nearestPoint.distanceTo(p) > n.lb.rect.distanceTo(p)) {
-                Point2D tempNearestPoint = nearest(p, n.lb, i + 1);
-                if (tempNearestPoint != null &&
-                        p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
-                    nearestPoint = tempNearestPoint;
+            if (n.rt != null) {
+                nearestPoint = nearest(p, nearestPoint, n.rt, i + 1);
+                nearestDistance = p.distanceTo(nearestPoint);
+            }
+            if (n.lb != null) {
+                if (nearestDistance > n.lb.rect.distanceTo(p)) {
+                    nearestPoint = nearest(p, nearestPoint, n.lb, i + 1);
+                    // nearestDistance = p.distanceTo(nearestPoint);
+                }
             }
         }
-        //
-        // // 剪枝条件不是在一侧找到点，就剪掉另一侧。而是一侧点到点的最短距离，小于点到分割的矩形边的距离。
-        // // 跟rectangle比有可能会左右两边都不包括点，所以应该用线延长到边界，比左右/上下。
-        // // 一、1.右边节点为空，2.左边有子节点且左边包含了query点
-        // if (n.rt == null || n.lb != null && lowerSide(n.p, p, i)) {
-        //     nearestPoint = nearest(p, n.lb, i + 1);
-        //     // 比较给定点到返回点和给定点点到边距离。点到点距离小才剪枝
-        //     // 如果分割线是纵向，则距离为横向。如果分割线是横向，则距离为纵向
-        //     if (n.rt != null && nearestPoint.distanceTo(p) > n.rt.rect.distanceTo(p)) {
-        //         Point2D tempNearestPoint = nearest(p, n.rt, i + 1);
-        //         if (tempNearestPoint != null &&
-        //                 p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
-        //             nearestPoint = tempNearestPoint;
-        //     }
-        // }
-        // // 二、1. 左边包含了，但是左边没有子节点； 2. 左边没有包含
-        // else if (n.rt != null) { // && higherSide(n.p, p, i)) {
-        //     nearestPoint = nearest(p, n.rt, i + 1);
-        //     if (n.lb != null) {
-        //         if (higherSide(n.p, p, i) && nearestPoint.distanceTo(p) > n.lb.rect.distanceTo(p) ||
-        //                 lowerSide(n.p, p, i) && nearestPoint.distanceTo(p) > n.rt.rect
-        //                         .distanceTo(p)) {
-        //             Point2D tempNearestPoint = nearest(p, n.lb, i + 1);
-        //             if (tempNearestPoint != null &&
-        //                     p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
-        //                 nearestPoint = tempNearestPoint;
-        //         }
-        //     }
-        // }
 
-        if (nearestPoint != null) {
-            double retDistance = nearestPoint.distanceTo(p);
-            if (retDistance < distance)
-                return nearestPoint;
-        }
-        return n.p;
+        return nearestPoint;
     }
 
     public static void main(
@@ -334,7 +307,7 @@ public class KdTree {
                 double x = StdDraw.mouseX();
                 double y = StdDraw.mouseY();
                 // Point2D query = new Point2D(x, y);
-                Point2D testPoint = new Point2D(0.24, 0.44);
+                Point2D testPoint = new Point2D(0.41, 0.5);
 
                 // StdOut.print(testPoint.distanceTo(p1) + "\n");
                 // StdOut.print(testPoint.distanceTo(p2) + "\n");
