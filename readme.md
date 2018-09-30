@@ -1,5 +1,5 @@
 # Algorithms 4th
-本仓库记录学习《算法 第四版》和coursera公开课Algorithms的内容。
+本仓库记录学习[《算法 第四版》](https://book.douban.com/subject/19952400/)和coursera公开课[Algorithms, Part I](https://www.coursera.org/learn/algorithms-part1)和[Algorithms, Part II](https://www.coursera.org/learn/algorithms-part2)的内容。
 
 ## Coursera公开课
 ### Part.1
