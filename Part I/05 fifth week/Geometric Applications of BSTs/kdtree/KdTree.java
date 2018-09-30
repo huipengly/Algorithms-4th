@@ -45,40 +45,62 @@ public class KdTree {
             Point2D p) {                    // add the point to the set (if it is not already in the set)
         if (p == null)
             throw new java.lang.IllegalArgumentException("point is null");
-        root = insert(root, p, 0, new RectHV(0, 0, 1, 1));
+        if (root == null) {
+            ++size;
+            root = new Node(p, new RectHV(0, 0, 1, 1));
+        }
+        else
+            root = insert(root, p, 0);
     }
 
     /* i % 2 表达横竖。0表示横，1表示竖 */
-    private Node insert(Node n, Point2D p, int i, RectHV re) {
-        if (n == null) {
-            ++size;                     //添加了一个节点
-            return new Node(p, re);
-        }
-
+    private Node insert(Node n, Point2D p, int i) {
         double x = n.p.x();
         double y = n.p.y();
 
         switch (i % 2) {
             case vertical:          // 纵向比较
                 if (p.x() < x) {    // p的x小，插入到左节点
-                    n.lb = insert(n.lb, p, i + 1,
-                                  new RectHV(re.xmin(), re.ymin(), x, re.ymax()));
+                    if (n.lb == null) {
+                        n.lb = new Node(p, new RectHV(n.rect.xmin(), n.rect.ymin(),
+                                                      x, n.rect.ymax()));
+                        ++size;
+                        return n;
+                    }
+                    n.lb = insert(n.lb, p, i + 1);
                 }
                 else if (p.x() > x ||
                         (p.x() == x && p.y() != y)) {     // p的x大，或p在分割线上，插入到右节点。忽略相同的节点
-                    n.rt = insert(n.rt, p, i + 1,
-                                  new RectHV(x, re.ymin(), re.xmax(), re.ymax()));
+                    if (n.rt == null) {
+                        n.rt = new Node(p, new RectHV(x, n.rect.ymin(),
+                                                      n.rect.xmax(), n.rect.ymax()));
+                        ++size;
+                        return n;
+                    }
+                    n.rt = insert(n.rt, p, i + 1);
                 }
                 break;
 
             case horizon:           // 横向节点比较y
-                if (p.y() < y)      // p的y小，插入到左节点
-                    n.lb = insert(n.lb, p, i + 1,
-                                  new RectHV(re.xmin(), re.ymin(), re.xmax(), y));
+                if (p.y() < y) {      // p的y小，插入到左节点
+                    if (n.lb == null) {
+                        n.lb = new Node(p, new RectHV(n.rect.xmin(), n.rect.ymin(),
+                                                      n.rect.xmax(), y));
+                        ++size;
+                        return n;
+                    }
+                    n.lb = insert(n.lb, p, i + 1);
+                }
                 else if (p.y() > y ||
-                        (p.y() == y && p.x() != x))      // p的y大，或p在分割线上，插入到右节点。忽略相同的节点
-                    n.rt = insert(n.rt, p, i + 1,
-                                  new RectHV(re.xmin(), y, re.xmax(), re.ymax()));
+                        (p.y() == y && p.x() != x)) {      // p的y大，或p在分割线上，插入到右节点。忽略相同的节点
+                    if (n.rt == null) {
+                        n.rt = new Node(p, new RectHV(n.rect.xmin(), y,
+                                                      n.rect.xmax(), n.rect.ymax()));
+                        ++size;
+                        return n;
+                    }
+                    n.rt = insert(n.rt, p, i + 1);
+                }
                 break;
         }
         return n;
@@ -93,17 +115,21 @@ public class KdTree {
     private boolean contains(Node n, Point2D p, int i) {
         if (n == null)
             return false;
+        double x = n.p.x();
+        double y = n.p.y();
         switch (i % 2) {
             case vertical:
-                if (n.p.x() < p.x()) return contains(n.rt, p, i + 1);
-                else if (n.p.x() > p.x()) return contains(n.lb, p, i + 1);
-                else if (n.p.y() != p.y()) return contains(n.lb, p, i + 1);
+                if (p.x() < x) return contains(n.lb, p, i + 1);
+                else if (p.x() > x ||
+                        (p.x() == x && p.y() != y))
+                    return contains(n.rt, p, i + 1);
                 break;
 
             case horizon:
-                if (n.p.y() < p.y()) return contains(n.rt, p, i + 1);
-                else if (n.p.y() > p.y()) return contains(n.lb, p, i + 1);
-                else if (n.p.x() != p.x()) return contains(n.lb, p, i + 1);
+                if (p.y() < y) return contains(n.lb, p, i + 1);
+                else if (p.y() > y ||
+                        (p.y() == y && p.x() != x))
+                    return contains(n.rt, p, i + 1);
                 break;
         }
         return true;
@@ -209,7 +235,7 @@ public class KdTree {
             nearestPoint = nearest(p, n.lb, i + 1);
             // 比较给定点到返回点和给定点点到边距离。点到点距离小才剪枝
             // 如果分割线是纵向，则距离为横向。如果分割线是横向，则距离为纵向
-            if (n.rt != null && p.distanceTo(nearestPoint) > distanceToRect(n.p, p, i)) {
+            if (n.rt != null && nearestPoint.distanceTo(p) > n.rect.distanceTo(p)) {
                 Point2D tempNearestPoint = nearest(p, n.rt, i + 1);
                 if (tempNearestPoint != null &&
                         p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
@@ -219,7 +245,7 @@ public class KdTree {
         // 二、1. 左边包含了，但是左边没有子节点； 2. 左边没有包含
         else if (n.rt != null) { // && higherSide(n.p, p, i)) {
             nearestPoint = nearest(p, n.rt, i + 1);
-            if (n.lb != null && p.distanceTo(nearestPoint) > distanceToRect(n.p, p, i)) {
+            if (n.lb != null && nearestPoint.distanceTo(p) > n.rect.distanceTo(p)) {
                 Point2D tempNearestPoint = nearest(p, n.lb, i + 1);
                 if (tempNearestPoint != null &&
                         p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
@@ -257,7 +283,7 @@ public class KdTree {
             kdTree.draw();
         }
 
-        // kdTree.contains(new Point2D(0.5, 0.4));
+        boolean a = kdTree.contains(new Point2D(0.92, 0.5));
 
         if (testNearestNeighbor) {
             // process nearest neighbor queries
@@ -267,7 +293,7 @@ public class KdTree {
                 double x = StdDraw.mouseX();
                 double y = StdDraw.mouseY();
                 // Point2D query = new Point2D(x, y);
-                Point2D testPoint = new Point2D(0.913, 0.673);
+                Point2D testPoint = new Point2D(0.24, 0.44);
 
                 // StdOut.print(testPoint.distanceTo(p1) + "\n");
                 // StdOut.print(testPoint.distanceTo(p2) + "\n");
