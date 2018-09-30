@@ -219,39 +219,80 @@ public class KdTree {
         }
     }
 
+    private int compare(Point2D p1, Point2D query, int i) {
+        switch (i % 2) {
+            case vertical:
+                return query.x() < p1.x() ? -1 : 1;
+            case horizon:
+                return query.y() < p1.y() ? -1 : 1;
+        }
+        return 0;
+    }
+
     private Point2D nearest(Point2D p, Node n, int i) {
         if (n == null)      // 判断节点是否为空
             return null;
 
-        double x = n.p.x();
-        double y = n.p.y();
+        // double x = n.p.x();
+        // double y = n.p.y();
         Point2D nearestPoint = null;
         double distance = n.p.distanceTo(p);
 
-        // 剪枝条件不是在一侧找到点，就剪掉另一侧。而是一侧点到点的最短距离，小于点到分割的矩形边的距离。
-        // 跟rectangle比有可能会左右两边都不包括点，所以应该用线延长到边界，比左右/上下。
-        // 一、1.右边节点为空，2.左边有子节点且左边包含了query点
-        if (n.rt == null || n.lb != null && lowerSide(n.p, p, i)) {
-            nearestPoint = nearest(p, n.lb, i + 1);
-            // 比较给定点到返回点和给定点点到边距离。点到点距离小才剪枝
-            // 如果分割线是纵向，则距离为横向。如果分割线是横向，则距离为纵向
-            if (n.rt != null && nearestPoint.distanceTo(p) > n.rect.distanceTo(p)) {
+        int cmp = compare(n.p, p, i);   // 判断在分割线的方位
+
+        if (cmp < 0) {
+            if (n.lb != null)
+                nearestPoint = nearest(p, n.lb, i + 1);
+            if (nearestPoint == null)
+                nearestPoint = nearest(p, n.rt, i + 1);
+            else if (n.rt != null && nearestPoint.distanceTo(p) > n.rt.rect.distanceTo(p)) {
                 Point2D tempNearestPoint = nearest(p, n.rt, i + 1);
                 if (tempNearestPoint != null &&
                         p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
                     nearestPoint = tempNearestPoint;
             }
         }
-        // 二、1. 左边包含了，但是左边没有子节点； 2. 左边没有包含
-        else if (n.rt != null) { // && higherSide(n.p, p, i)) {
-            nearestPoint = nearest(p, n.rt, i + 1);
-            if (n.lb != null && nearestPoint.distanceTo(p) > n.rect.distanceTo(p)) {
+        else {
+            if (n.rt != null)
+                nearestPoint = nearest(p, n.rt, i + 1);
+            if (nearestPoint == null)
+                nearestPoint = nearest(p, n.lb, i + 1);
+            else if (n.lb != null && nearestPoint.distanceTo(p) > n.lb.rect.distanceTo(p)) {
                 Point2D tempNearestPoint = nearest(p, n.lb, i + 1);
                 if (tempNearestPoint != null &&
                         p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
                     nearestPoint = tempNearestPoint;
             }
         }
+        //
+        // // 剪枝条件不是在一侧找到点，就剪掉另一侧。而是一侧点到点的最短距离，小于点到分割的矩形边的距离。
+        // // 跟rectangle比有可能会左右两边都不包括点，所以应该用线延长到边界，比左右/上下。
+        // // 一、1.右边节点为空，2.左边有子节点且左边包含了query点
+        // if (n.rt == null || n.lb != null && lowerSide(n.p, p, i)) {
+        //     nearestPoint = nearest(p, n.lb, i + 1);
+        //     // 比较给定点到返回点和给定点点到边距离。点到点距离小才剪枝
+        //     // 如果分割线是纵向，则距离为横向。如果分割线是横向，则距离为纵向
+        //     if (n.rt != null && nearestPoint.distanceTo(p) > n.rt.rect.distanceTo(p)) {
+        //         Point2D tempNearestPoint = nearest(p, n.rt, i + 1);
+        //         if (tempNearestPoint != null &&
+        //                 p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
+        //             nearestPoint = tempNearestPoint;
+        //     }
+        // }
+        // // 二、1. 左边包含了，但是左边没有子节点； 2. 左边没有包含
+        // else if (n.rt != null) { // && higherSide(n.p, p, i)) {
+        //     nearestPoint = nearest(p, n.rt, i + 1);
+        //     if (n.lb != null) {
+        //         if (higherSide(n.p, p, i) && nearestPoint.distanceTo(p) > n.lb.rect.distanceTo(p) ||
+        //                 lowerSide(n.p, p, i) && nearestPoint.distanceTo(p) > n.rt.rect
+        //                         .distanceTo(p)) {
+        //             Point2D tempNearestPoint = nearest(p, n.lb, i + 1);
+        //             if (tempNearestPoint != null &&
+        //                     p.distanceTo(tempNearestPoint) < p.distanceTo(nearestPoint))
+        //                 nearestPoint = tempNearestPoint;
+        //         }
+        //     }
+        // }
 
         if (nearestPoint != null) {
             double retDistance = nearestPoint.distanceTo(p);
