@@ -79,6 +79,6 @@ WordNet是指一个包含唯一根的有向无环图，图中每一组词表示�
 **边界条件**：判断是否有环，调用DirectedCycle类。判断是否有多个root，如果一个点有一个出的边，则不是root。
 
 ### Outcast detection
-构造函数：构造digraph
+构造函数：因为需要immutable，要拷贝WordNet。暂时先不考虑这个，直接引用参数里的wordnet。
 
 outcast：计算每个输入词和其他词的距离，输出最大的

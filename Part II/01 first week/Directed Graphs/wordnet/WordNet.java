@@ -1,5 +1,5 @@
 /* *****************************************************************************
- *  Name:           WordNet
+ *  Name:           WordNet.java
  *  Date:           20181018
  *  Description:    WordNet
  *  Author:         huipengly
