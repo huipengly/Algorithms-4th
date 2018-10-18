@@ -2,7 +2,7 @@
  *  Name:           SAP.java
  *  Date:           20181018
  *  Description:    Shortest ancestral path 最短祖先距离
- *  author:         huipengly
+ *  Author:         huipengly
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
@@ -21,6 +21,9 @@ public class SAP {
 
     // constructor takes a digraph (not necessarily a DAG)
     public SAP(Digraph G) {
+        if (G == null) {
+            throw new java.lang.IllegalArgumentException("use a null digraph");
+        }
         this.G = new Digraph(G);
     }
 
@@ -55,6 +58,9 @@ public class SAP {
     }
 
     private Ancestor searchSap(Iterable<Integer> v, Iterable<Integer> w) {
+        if (v == null || w == null) {
+            throw new java.lang.IllegalArgumentException("use a null Iterator");
+        }
         Ancestor shortestAncestor = new Ancestor();
         for (int vv : v) {          // 两个集合，两两计算最短祖先，求出最短的。时间肯定有问题啊！
             for (int ww : w) {
@@ -97,7 +103,5 @@ public class SAP {
         int length = sap.length(v, w);
         int ancestor = sap.ancestor(v, w);
         StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
-
-        
     }
 }
