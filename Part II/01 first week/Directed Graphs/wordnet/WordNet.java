@@ -15,9 +15,9 @@ import java.util.HashMap;
 
 public class WordNet {
     // synset用来存词对应的id，使用一个hashmap，key为单词，value为序号的合集
-    private HashMap<String, Bag<Integer>> synsets = new HashMap<>();
+    private final HashMap<String, Bag<Integer>> synsets = new HashMap<>();
     // synsetsId用来存id对应的单词
-    private HashMap<Integer, Bag<String>> synsetsId = new HashMap<>();
+    private final HashMap<Integer, String> synsetsId = new HashMap<>();
     // 上位词的关系存在sap的digraph里
     private SAP sap;
 
@@ -38,14 +38,13 @@ public class WordNet {
             String[] info = line.split(",");            // 按照逗号切割，总共会切割成三份。0为id，1为noun，2为gloss
             int id = Integer.parseInt(info[0]);
             if (!synsetsId.containsKey(id)) {
-                synsetsId.put(id, new Bag<>());
+                synsetsId.put(id, info[1]);             // 添加id对应的单词
             }
-            for (String noun : info[1].split(" ")) {    // 将noun按照空格分开处理
+            for (String noun : info[1].split("\\s")) {  // 将noun按照空格分开处理，这里不是直接一个空格
                 if (!synsets.containsKey(noun)) {       // 如果第一次出现，则需要新建一个bag
                     synsets.put(noun, new Bag<>());
                 }
                 synsets.get(noun).add(id);              // 添加单词对应的id
-                synsetsId.get(id).add(noun);            // 添加id对应的单词
             }
 
             v = id > v ? id : v;                        // 用来记录最大的id
@@ -94,6 +93,9 @@ public class WordNet {
 
     // is the word a WordNet noun?
     public boolean isNoun(String word) {
+        if (word == null) {
+            throw new java.lang.IllegalArgumentException("null argument");
+        }
         return synsets.containsKey(word);
     }
 
@@ -111,9 +113,8 @@ public class WordNet {
         if (!isNoun(nounA) || !isNoun(nounB)) {
             throw new java.lang.IllegalArgumentException("argument is not a WordNet noun.");
         }
-        // 这里为什么只返回一个string？？
-        return synsetsId.get(sap.ancestor(synsets.get(nounA), synsets.get(nounB))).iterator()
-                        .next();
+        // 这里就是返回所有的词，还是按照原来空格分开的
+        return synsetsId.get(sap.ancestor(synsets.get(nounA), synsets.get(nounB)));
     }
 
     // do unit testing of this class
