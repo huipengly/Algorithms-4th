@@ -2,7 +2,7 @@
 本仓库记录学习[《算法 第四版》](https://book.douban.com/subject/19952400/)和coursera公开课[Algorithms, Part I](https://www.coursera.org/learn/algorithms-part1)和[Algorithms, Part II](https://www.coursera.org/learn/algorithms-part2)的内容。
 
 ## Coursera公开课
-### Part.1
+### Part I
 1. first week
 
     [Programming Assignment 1: Percolation](Part%20I/01%20first%20week/Union-Find/percolation)
@@ -23,6 +23,11 @@
 以上代码均100分，格式上可能不好看，但是都已实现功能，包括extra。
 
 PS：不是写java的，只是为了实现思想，代码写的比较差，看看就好。
+
+### Part II
+1. first week
+
+    [Programming Assignment 1: WordNet](Part%20II/01%20first%20week/Directed%20Graphs)
 
 ## ToDo Lists
 
