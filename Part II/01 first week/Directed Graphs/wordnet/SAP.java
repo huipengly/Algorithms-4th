@@ -11,6 +11,8 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.Iterator;
+
 public class SAP {
     private final Digraph G;
 
@@ -61,12 +63,33 @@ public class SAP {
         if (v == null || w == null) {
             throw new java.lang.IllegalArgumentException("use a null Iterator");
         }
+
+        // 判断迭代器中是否有null
+        Iterator<Integer> itV = v.iterator();
+        while (itV.hasNext()) {
+            if (itV.next() == null) {
+                throw new java.lang.IllegalArgumentException("null member in arguments");
+            }
+        }
+        Iterator<Integer> itW = w.iterator();
+        while (itW.hasNext()) {
+            if (itW.next() == null) {
+                throw new java.lang.IllegalArgumentException("null member in arguments");
+            }
+        }
+
         Ancestor shortestAncestor = new Ancestor();
-        for (int vv : v) {          // 两个集合，两两计算最短祖先，求出最短的。时间肯定有问题啊！
-            for (int ww : w) {
-                Ancestor ancestor = searchSap(vv, ww);
-                if (ancestor.length < shortestAncestor.length || shortestAncestor.length == -1) {
-                    shortestAncestor = ancestor;
+        int vNumber = G.V();                    // vertices 顶点个数
+        BreadthFirstDirectedPaths vBFS = new BreadthFirstDirectedPaths(G, v);   // 这里计算每个点到集合的最短距离
+        BreadthFirstDirectedPaths wBFS = new BreadthFirstDirectedPaths(G, w);
+
+        for (int i = 0; i != vNumber; ++i) {    // 计算到每个点的最短祖先距离，更新最短始祖
+            if (vBFS.hasPathTo(i) && wBFS.hasPathTo(i)) {
+                // 最短距离就是点到集合的距离的和，因为不需要知道路径，所以可以不考虑这些消息
+                int length = vBFS.distTo(i) + wBFS.distTo(i);
+                if (length < shortestAncestor.length || shortestAncestor.length == -1) {
+                    shortestAncestor.length = length;
+                    shortestAncestor.ancestor = i;
                 }
             }
         }
@@ -94,7 +117,7 @@ public class SAP {
 
         Stack<Integer> v = new Stack<>();
         v.push(13);
-        v.push(23);
+        v.push(1);
         v.push(24);
         Stack<Integer> w = new Stack<>();
         w.push(6);
