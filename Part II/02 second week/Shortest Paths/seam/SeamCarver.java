@@ -171,11 +171,33 @@ public class SeamCarver {
         }
     }
 
-    // // remove horizontal seam from current picture
-    // public void removeHorizontalSeam(int[] seam) {
-    //
-    // }
-    //
-    // // remove vertical seam from current picture
-    // public void removeVerticalSeam(int[] seam)
+    // remove horizontal seam from current picture
+    public void removeHorizontalSeam(int[] seam) {
+        int width = width();
+        int height = height() - 1;
+        Picture newPicture = new Picture(width, height);
+        for (int i = 0; i != width; ++i) {
+            for (int j = 0; j != height; ++j) {
+                // 像素在删除点下面，则拷贝的是原图行列下一个坐标
+                int row = j >= seam[i] ? j + 1 : j;
+                newPicture.set(i, j, picture.get(i, row));
+            }
+        }
+        picture = newPicture;
+    }
+
+    // remove vertical seam from current picture
+    public void removeVerticalSeam(int[] seam) {
+        int width = width() - 1;
+        int height = height();
+        Picture newPicture = new Picture(width, height);
+        for (int i = 0; i != width; ++i) {
+            for (int j = 0; j != height; ++j) {
+                // 像素在删除点下面，则拷贝的是原图行列下一个坐标
+                int col = i >= seam[j] ? i + 1 : i;
+                newPicture.set(i, j, picture.get(col, j));
+            }
+        }
+        picture = newPicture;
+    }
 }
