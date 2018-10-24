@@ -6,7 +6,6 @@
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.Picture;
-import edu.princeton.cs.algs4.StdOut;
 
 public class SeamCarver {
     private Picture picture;
@@ -55,21 +54,31 @@ public class SeamCarver {
         return Math.sqrt(rx * rx + gx * gx + bx * bx + ry * ry + gy * gy + by * by);
     }
 
-    // sequence of indices for vertical seam
-    public int[] findVerticalSeam() {
-        double[][] distTo = new double[picture.width()][picture.height()];
-        Pixel[][] edgeTo = new Pixel[picture.width()][picture.height()];
-        double[][] energeMatrix = new double[width()][height()];
+    // sequence of indices for horizontal seam
+    public int[] findHorizontalSeam() {
+        double[][] energeMatrix = new double[height()][width()];
 
-        // 初始化距离，第一行为1000，其他为无穷大
-        for (int i = 0; i != width(); ++i) {
-            distTo[i][0] = 1000;
-        }
-        for (int i = 0; i != width(); ++i) {
-            for (int j = 1; j != height(); ++j) {
-                distTo[i][j] = Double.POSITIVE_INFINITY;
+        // 计算能量矩阵
+        for (int i = 0; i != height(); ++i) {
+            for (int j = 0; j != width(); ++j) {
+                energeMatrix[i][j] = energy(j, i);
             }
         }
+
+        // // 输出能量矩阵，调试用
+        // for (int i = 0; i != height(); ++i) {
+        //     for (int j = 0; j != width(); ++j) {
+        //         StdOut.print(energeMatrix[j][i] + "\t");
+        //     }
+        //     StdOut.print("\n");
+        // }
+
+        return findSeam(energeMatrix);
+    }
+
+    // sequence of indices for vertical seam
+    public int[] findVerticalSeam() {
+        double[][] energeMatrix = new double[width()][height()];
 
         // 计算能量矩阵
         for (int i = 0; i != width(); ++i) {
@@ -78,12 +87,31 @@ public class SeamCarver {
             }
         }
 
-        // 输出能量矩阵，调试用
-        for (int i = 0; i != height(); ++i) {
-            for (int j = 0; j != width(); ++j) {
-                StdOut.print(energeMatrix[j][i] + "\t");
+        // // 输出能量矩阵，调试用
+        // for (int i = 0; i != height(); ++i) {
+        //     for (int j = 0; j != width(); ++j) {
+        //         StdOut.print(energeMatrix[j][i] + "\t");
+        //     }
+        //     StdOut.print("\n");
+        // }
+
+        return findSeam(energeMatrix);
+    }
+
+    private int[] findSeam(double[][] energeMatrix) {
+        int width = energeMatrix.length;
+        int height = energeMatrix[0].length;
+        double[][] distTo = new double[width][height];
+        Pixel[][] edgeTo = new Pixel[width][height];
+
+        // 初始化距离，第一行为1000，其他为无穷大
+        for (int i = 0; i != width; ++i) {
+            distTo[i][0] = 1000;
+        }
+        for (int i = 0; i != width; ++i) {
+            for (int j = 1; j != height; ++j) {
+                distTo[i][j] = Double.POSITIVE_INFINITY;
             }
-            StdOut.print("\n");
         }
 
         // dfs先找出后逆序
@@ -97,17 +125,17 @@ public class SeamCarver {
         }
 
         // 从最后一行找出最短距离
-        int[] seam = new int[height()];
-        seam[height() - 1] = 0;
+        int[] seam = new int[height];
+        seam[height - 1] = 0;
         double shortest = Double.POSITIVE_INFINITY;
-        for (int i = 0; i != width(); ++i) {
-            if (distTo[i][height() - 2] < shortest) {
-                shortest = distTo[i][height() - 2];
-                seam[height() - 1] = i;
+        for (int i = 0; i != width; ++i) {
+            if (distTo[i][height - 2] < shortest) {
+                shortest = distTo[i][height - 2];
+                seam[height - 1] = i;
             }
         }
         // 然后反向寻找最短路径
-        for (int i = height() - 1; i != 0; --i) {
+        for (int i = height - 1; i != 0; --i) {
             seam[i - 1] = edgeTo[seam[i]][i].x();
         }
 
@@ -116,9 +144,11 @@ public class SeamCarver {
 
     // 松弛p点
     void relax(double[][] energeMatrix, Pixel p, double[][] distTo, Pixel[][] edgeTo) {
+        int width = distTo.length;
+        int height = distTo[0].length;
         int x = p.x();
         int y = p.y();
-        if (y != height() - 1) {
+        if (y != height - 1) {
             // 左下
             if (x != 0) {
                 if (distTo[x - 1][y + 1] > distTo[x][y] + energeMatrix[x - 1][y + 1]) {
@@ -132,7 +162,7 @@ public class SeamCarver {
                 edgeTo[x][y + 1] = p;
             }
             // 右下
-            if (x != width() - 1) {
+            if (x != width - 1) {
                 if (distTo[x + 1][y + 1] > distTo[x][y] + energeMatrix[x + 1][y + 1]) {
                     distTo[x + 1][y + 1] = distTo[x][y] + energeMatrix[x + 1][y + 1];
                     edgeTo[x + 1][y + 1] = p;
@@ -140,11 +170,6 @@ public class SeamCarver {
             }
         }
     }
-
-    // // sequence of indices for horizontal seam
-    // public int[] findHorizontalSeam() {
-    //     double[][] en
-    // }
 
     // // remove horizontal seam from current picture
     // public void removeHorizontalSeam(int[] seam) {
