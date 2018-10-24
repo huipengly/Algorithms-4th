@@ -15,12 +15,23 @@ public class SeamCarver {
         if (picture == null) {
             throw new java.lang.IllegalArgumentException("null parameter.");
         }
-        this.picture = picture;
+        this.picture = new Picture(picture.width(), picture.height());
+        for (int i = 0; i != width(); ++i) {
+            for (int j = 0; j != height(); ++j) {
+                this.picture.set(i, j, picture.get(i, j));
+            }
+        }
     }
 
     // current picture
     public Picture picture() {
-        return picture;
+        Picture retPicture = new Picture(picture.width(), picture.height());
+        for (int i = 0; i != width(); ++i) {
+            for (int j = 0; j != height(); ++j) {
+                retPicture.set(i, j, picture.get(i, j));
+            }
+        }
+        return retPicture;
     }
 
     // width of current picture
@@ -135,8 +146,8 @@ public class SeamCarver {
         seam[height - 1] = 0;
         double shortest = Double.POSITIVE_INFINITY;
         for (int i = 0; i != width; ++i) {
-            if (distTo[i][height - 2] < shortest) {
-                shortest = distTo[i][height - 2];
+            if (distTo[i][height - 1] < shortest) {
+                shortest = distTo[i][height - 1];
                 seam[height - 1] = i;
             }
         }
@@ -149,7 +160,7 @@ public class SeamCarver {
     }
 
     // 松弛p点
-    void relax(double[][] energeMatrix, Pixel p, double[][] distTo, Pixel[][] edgeTo) {
+    private void relax(double[][] energeMatrix, Pixel p, double[][] distTo, Pixel[][] edgeTo) {
         int width = distTo.length;
         int height = distTo[0].length;
         int x = p.x();
@@ -188,9 +199,13 @@ public class SeamCarver {
         if (seam.length != width()) {
             throw new java.lang.IllegalArgumentException("seam has wrong length.");
         }
-        for (int i = 0; i != seam.length - 1; ++i) {
+        for (int i = 0; i != seam.length; ++i) {
+            // 接缝值超出范围
+            if (seam[i] < 0 || seam[i] > height() - 1) {
+                throw new java.lang.IllegalArgumentException("seam out of range.");
+            }
             // 接缝距离差超过1，不相连，错误。
-            if (Math.abs(seam[i + 1] - seam[i]) > 1) {
+            if (i != seam.length - 1 && Math.abs(seam[i + 1] - seam[i]) > 1) {
                 throw new java.lang.IllegalArgumentException("seam doesn't connected.");
             }
         }
@@ -218,9 +233,13 @@ public class SeamCarver {
         if (seam.length != height()) {
             throw new java.lang.IllegalArgumentException("seam has wrong length.");
         }
-        for (int i = 0; i != seam.length - 1; ++i) {
+        for (int i = 0; i != seam.length; ++i) {
+            // 接缝值超出范围
+            if (seam[i] < 0 || seam[i] > width() - 1) {
+                throw new java.lang.IllegalArgumentException("seam out of range.");
+            }
             // 接缝距离差超过1，不相连，错误。
-            if (Math.abs(seam[i + 1] - seam[i]) > 1) {
+            if (i != seam.length - 1 && Math.abs(seam[i + 1] - seam[i]) > 1) {
                 throw new java.lang.IllegalArgumentException("seam doesn't connected.");
             }
         }
