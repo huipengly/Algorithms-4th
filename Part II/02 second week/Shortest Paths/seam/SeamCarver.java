@@ -57,25 +57,28 @@ public class SeamCarver {
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        double[][] distTo;
-        Pixel[][] edgeTo;
-        distTo = new double[picture.width()][picture.height()];
+        double[][] distTo = new double[picture.width()][picture.height()];
+        Pixel[][] edgeTo = new Pixel[picture.width()][picture.height()];
+        double[][] energeMatrix = new double[width()][height()];
+
+        // 初始化距离，第一行为1000，其他为无穷大
         for (int i = 0; i != width(); ++i) {
             distTo[i][0] = 1000;
         }
         for (int i = 0; i != width(); ++i) {
             for (int j = 1; j != height(); ++j) {
-                distTo[i][j] = 1e10;
+                distTo[i][j] = Double.POSITIVE_INFINITY;
             }
         }
-        edgeTo = new Pixel[picture.width()][picture.height()];
-        double[][] energeMatrix = new double[width()][height()];
+
+        // 计算能量矩阵
         for (int i = 0; i != width(); ++i) {
             for (int j = 0; j != height(); ++j) {
                 energeMatrix[i][j] = energy(i, j);
             }
         }
 
+        // 输出能量矩阵，调试用
         for (int i = 0; i != height(); ++i) {
             for (int j = 0; j != width(); ++j) {
                 StdOut.print(energeMatrix[j][i] + "\t");
@@ -83,24 +86,27 @@ public class SeamCarver {
             StdOut.print("\n");
         }
 
+        // dfs先找出后逆序
         DepthFirstOrder dfs = new DepthFirstOrder(energeMatrix);
         // for (Pixel p : dfs.reversePost()) {
         //     StdOut.print(p.x() + " " + p.y() + "\n");
         // }
+        // 根据后逆序，依此松弛点
         for (Pixel p : dfs.reversePost()) {
             relax(energeMatrix, p, distTo, edgeTo);
         }
 
-        // 从最后一行找出最短距离，然后反向寻找最短路径
+        // 从最后一行找出最短距离
         int[] seam = new int[height()];
         seam[height() - 1] = 0;
-        double shortest = 1e10;
+        double shortest = Double.POSITIVE_INFINITY;
         for (int i = 0; i != width(); ++i) {
             if (distTo[i][height() - 2] < shortest) {
                 shortest = distTo[i][height() - 2];
                 seam[height() - 1] = i;
             }
         }
+        // 然后反向寻找最短路径
         for (int i = height() - 1; i != 0; --i) {
             seam[i - 1] = edgeTo[seam[i]][i].x();
         }
