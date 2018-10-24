@@ -12,6 +12,9 @@ public class SeamCarver {
 
     // create a seam carver object based on the given picture
     public SeamCarver(Picture picture) {
+        if (picture == null) {
+            throw new java.lang.IllegalArgumentException("null parameter.");
+        }
         this.picture = picture;
     }
 
@@ -32,6 +35,9 @@ public class SeamCarver {
 
     // energy of pixel at column x and row y
     public double energy(int x, int y) {
+        if (x < 0 || x > width() - 1 || y < 0 || y > height() - 1) {
+            throw new java.lang.IllegalArgumentException("x or y out of range.");
+        }
         if (x == 0 || x == width() - 1 || y == 0 || y == height() - 1) {
             return 1000;
         }
@@ -173,6 +179,21 @@ public class SeamCarver {
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
+        if (seam == null) {
+            throw new java.lang.IllegalArgumentException("null parameter.");
+        }
+        if (height() <= 1) {
+            throw new java.lang.IllegalArgumentException("picture will disappear.");
+        }
+        if (seam.length != width()) {
+            throw new java.lang.IllegalArgumentException("seam has wrong length.");
+        }
+        for (int i = 0; i != seam.length - 1; ++i) {
+            // 接缝距离差超过1，不相连，错误。
+            if (Math.abs(seam[i + 1] - seam[i]) > 1) {
+                throw new java.lang.IllegalArgumentException("seam doesn't connected.");
+            }
+        }
         int width = width();
         int height = height() - 1;
         Picture newPicture = new Picture(width, height);
@@ -188,6 +209,21 @@ public class SeamCarver {
 
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
+        if (seam == null) {
+            throw new java.lang.IllegalArgumentException("null parameter.");
+        }
+        if (width() <= 1) {
+            throw new java.lang.IllegalArgumentException("picture will disappear.");
+        }
+        if (seam.length != height()) {
+            throw new java.lang.IllegalArgumentException("seam has wrong length.");
+        }
+        for (int i = 0; i != seam.length - 1; ++i) {
+            // 接缝距离差超过1，不相连，错误。
+            if (Math.abs(seam[i + 1] - seam[i]) > 1) {
+                throw new java.lang.IllegalArgumentException("seam doesn't connected.");
+            }
+        }
         int width = width() - 1;
         int height = height();
         Picture newPicture = new Picture(width, height);
