@@ -10,22 +10,10 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class SeamCarver {
     private Picture picture;
-    private double[][] distTo;
-    private Pixel[][] edgeTo;
 
     // create a seam carver object based on the given picture
     public SeamCarver(Picture picture) {
         this.picture = picture;
-        distTo = new double[picture.width()][picture.height()];
-        for (int i = 0; i != width(); ++i) {
-            distTo[i][0] = 1000;
-        }
-        for (int i = 0; i != width(); ++i) {
-            for (int j = 1; j != height(); ++j) {
-                distTo[i][j] = 1e10;
-            }
-        }
-        edgeTo = new Pixel[picture.width()][picture.height()];
     }
 
     // current picture
@@ -69,6 +57,18 @@ public class SeamCarver {
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
+        double[][] distTo;
+        Pixel[][] edgeTo;
+        distTo = new double[picture.width()][picture.height()];
+        for (int i = 0; i != width(); ++i) {
+            distTo[i][0] = 1000;
+        }
+        for (int i = 0; i != width(); ++i) {
+            for (int j = 1; j != height(); ++j) {
+                distTo[i][j] = 1e10;
+            }
+        }
+        edgeTo = new Pixel[picture.width()][picture.height()];
         double[][] energeMatrix = new double[width()][height()];
         for (int i = 0; i != width(); ++i) {
             for (int j = 0; j != height(); ++j) {
@@ -76,38 +76,40 @@ public class SeamCarver {
             }
         }
 
-        DepthFirstOrder dfs = new DepthFirstOrder(energeMatrix);
-        for (Pixel p : dfs.reversePost()) {
-            StdOut.print(p.x() + " " + p.y() + "\n");
-        }
-        for (Pixel p : dfs.reversePost()) {
-            relax(energeMatrix, p);
+        for (int i = 0; i != height(); ++i) {
+            for (int j = 0; j != width(); ++j) {
+                StdOut.print(energeMatrix[j][i] + "\t");
+            }
+            StdOut.print("\n");
         }
 
-        int seamEndY = 0;
+        DepthFirstOrder dfs = new DepthFirstOrder(energeMatrix);
+        // for (Pixel p : dfs.reversePost()) {
+        //     StdOut.print(p.x() + " " + p.y() + "\n");
+        // }
+        for (Pixel p : dfs.reversePost()) {
+            relax(energeMatrix, p, distTo, edgeTo);
+        }
+
+        // 从最后一行找出最短距离，然后反向寻找最短路径
+        int[] seam = new int[height()];
+        seam[height() - 1] = 0;
         double shortest = 1e10;
         for (int i = 0; i != width(); ++i) {
             if (distTo[i][height() - 2] < shortest) {
                 shortest = distTo[i][height() - 2];
-                seamEndY = i;
+                seam[height() - 1] = i;
             }
         }
-
-        int[] seam = new int[height()];
-        // 首尾根据最短路径决定
-        seam[height() - 1] = seamEndY;
-        seam[height() - 2] = seamEndY;
-        for (int i = height() - 3; i != 0; --i) {
-            seam[i] = edgeTo[seam[i + 1]][i].x();
+        for (int i = height() - 1; i != 0; --i) {
+            seam[i - 1] = edgeTo[seam[i]][i].x();
         }
-
-        seam[0] = seam[1];
 
         return seam;
     }
 
-    // 松弛p1到p2点
-    void relax(double[][] energeMatrix, Pixel p) {
+    // 松弛p点
+    void relax(double[][] energeMatrix, Pixel p, double[][] distTo, Pixel[][] edgeTo) {
         int x = p.x();
         int y = p.y();
         if (y != height() - 1) {
@@ -135,9 +137,9 @@ public class SeamCarver {
 
     // // sequence of indices for horizontal seam
     // public int[] findHorizontalSeam() {
-    //
+    //     double[][] en
     // }
-    //
+
     // // remove horizontal seam from current picture
     // public void removeHorizontalSeam(int[] seam) {
     //
