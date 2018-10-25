@@ -37,7 +37,7 @@ public class BaseballElimination {
         g = new int[numberOfTeam][numberOfTeam];
         for (int i = 0; i != numberOfTeam; ++i) {
             String line = in.readLine();
-            String[] teamInfo = line.split("\\s+");
+            String[] teamInfo = line.trim().split("\\s+");  // 去除字符串首位空格
             teamMap.put(teamInfo[0], i);
             numberMap.put(i, teamInfo[0]);
             w[i] = Integer.parseInt(teamInfo[1]);
@@ -65,21 +65,36 @@ public class BaseballElimination {
 
     // numberOfTeam of wins for given team
     public int wins(String team) {
+        if (!teamMap.containsKey(team)) {
+            throw new java.lang.IllegalArgumentException("don't have " + team);
+        }
         return w[teamMap.get(team)];
     }
 
     // numberOfTeam of losses for given team
     public int losses(String team) {
+        if (!teamMap.containsKey(team)) {
+            throw new java.lang.IllegalArgumentException("don't have " + team);
+        }
         return l[teamMap.get(team)];
     }
 
     // numberOfTeam of remaining games for given team
     public int remaining(String team) {
+        if (!teamMap.containsKey(team)) {
+            throw new java.lang.IllegalArgumentException("don't have " + team);
+        }
         return r[teamMap.get(team)];
     }
 
     // numberOfTeam of remaining games between team1 and team2
     public int against(String team1, String team2) {
+        if (!teamMap.containsKey(team1)) {
+            throw new java.lang.IllegalArgumentException("don't have " + team1);
+        }
+        if (!teamMap.containsKey(team2)) {
+            throw new java.lang.IllegalArgumentException("don't have " + team2);
+        }
         return g[teamMap.get(team1)][teamMap.get(team2)];
     }
 
@@ -98,36 +113,40 @@ public class BaseballElimination {
         restGame = 0;
         // 连接起点和比赛，比赛和队伍
         // 遍历所有比赛，如果存在则添加边。注意要跳过x
-        int number = 1;
+        int counter = 1;
         for (int i = 0; i != numberOfTeam - 1; ++i) {
             for (int j = i + 1; j != numberOfTeam - 1; ++j) {       // j从i+1开始，组合不重复
                 int t1 = i < x ? i : i + 1;     // 表示不包括x的队伍，如果编号在x之前，则队伍编号就是循环的数。不然就要+1，跳过x
                 int t2 = j < x ? j : j + 1;
                 if (g[t1][t2] != 0) {
-                    // int number = t1 * (numberOfTeam - 1) + t2;           // 比赛所代表的编号
-                    FlowEdge edge = new FlowEdge(s, number, g[t1][t2]);     // 起点和比赛的边
+                    FlowEdge edge = new FlowEdge(s, counter, g[t1][t2]);     // 起点和比赛的边
                     restGame += g[t1][t2];
                     flowNetwork.addEdge(edge);
                     // 比赛和队伍的边
-                    edge = new FlowEdge(number, t1 + teamStart, Double.POSITIVE_INFINITY);
+                    edge = new FlowEdge(counter, i + teamStart, Double.POSITIVE_INFINITY);
                     flowNetwork.addEdge(edge);
-                    edge = new FlowEdge(number, t2 + teamStart, Double.POSITIVE_INFINITY);
+                    edge = new FlowEdge(counter, j + teamStart, Double.POSITIVE_INFINITY);
                     flowNetwork.addEdge(edge);
                 }
-                ++number;
+                ++counter;
             }
         }
         // 队伍和终点
+        counter = 0;
         for (int i = 0; i != numberOfTeam - 1; ++i) {
             int team = i < x ? i : i + 1;
-            FlowEdge edge = new FlowEdge(team + teamStart, t, w[x] + r[x] - w[team]);
+            FlowEdge edge = new FlowEdge(counter + teamStart, t, w[x] + r[x] - w[team]);
             flowNetwork.addEdge(edge);
+            ++counter;
         }
         // StdOut.print(flowNetwork.toString());
     }
 
     // is given team eliminated?
     public boolean isEliminated(String team) {
+        if (!teamMap.containsKey(team)) {
+            throw new java.lang.IllegalArgumentException("don't have " + team);
+        }
         int x = teamMap.get(team);
         if (isTrivialElimination(x) != -1) {
             return true;
@@ -142,12 +161,15 @@ public class BaseballElimination {
 
     // subset R of teams that eliminates given team; null if not eliminated
     public Iterable<String> certificateOfElimination(String team) {
+        if (!teamMap.containsKey(team)) {
+            throw new java.lang.IllegalArgumentException("don't have " + team);
+        }
         int x = teamMap.get(team);
-        SET<String> r = new SET<>();
+        SET<String> subsetR = new SET<>();
         int trivialElimination = isTrivialElimination(x);
         if (trivialElimination != -1) {
-            r.add(numberMap.get(trivialElimination));
-            return r;
+            subsetR.add(numberMap.get(trivialElimination));
+            return subsetR;
         }
         buildFlowNetWork(x);
         fordFulkerson = new FordFulkerson(flowNetwork, s, t);
@@ -157,27 +179,19 @@ public class BaseballElimination {
                 int t1 = i < x ? i : i + 1;
                 int t2 = j < x ? j : j + 1;
                 if (fordFulkerson.inCut(number)) {
-                    r.add(numberMap.get(t1));
-                    r.add(numberMap.get(t2));
+                    subsetR.add(numberMap.get(t1));
+                    subsetR.add(numberMap.get(t2));
                 }
+                ++number;
             }
         }
-        return r;
+        return subsetR.isEmpty() ? null : subsetR;
     }
 
     public static void main(String[] args) {
-        // BaseballElimination baseballElimination = new BaseballElimination(args[0]);
-        // String team = "Detroit";
-        // if (baseballElimination.isEliminated(team)) {
-        //     StdOut.print(team + "is eliminated by the subset R = { ");
-        //     for (String t : baseballElimination.certificateOfElimination(team)) {
-        //         StdOut.print(t + " ");
-        //     }
-        //     StdOut.print("}\n");
-        // }
-
         BaseballElimination division = new BaseballElimination(args[0]);
         for (String team : division.teams()) {
+            // String team = "Ghaddafi";
             if (division.isEliminated(team)) {
                 StdOut.print(team + " is eliminated by the subset R = { ");
                 for (String t : division.certificateOfElimination(team)) {
