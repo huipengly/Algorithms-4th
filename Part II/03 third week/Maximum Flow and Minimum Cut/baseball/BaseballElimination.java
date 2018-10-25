@@ -6,6 +6,7 @@
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
 
 import java.util.HashMap;
 
@@ -70,11 +71,24 @@ public class BaseballElimination {
         return g[teamMap.get(team1)][teamMap.get(team2)];
     }
 
-    // // is given team eliminated?
-    // public boolean isEliminated(String team) {
-    //
-    // }
-    //
+    private boolean isTrivialElimination(int teamNumber) {
+        int maxWin = w[teamNumber] + r[teamNumber];
+        for (int i = 0; i != number; ++i) {
+            if (maxWin < w[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // is given team eliminated?
+    public boolean isEliminated(String team) {
+        if (isTrivialElimination(teamMap.get(team))) {
+            return false;
+        }
+        return true;
+    }
+
     // // subset R of teams that eliminates given team; null if not eliminated
     // public Iterable<String> certificateOfElimination(String team) {
     //
@@ -82,6 +96,8 @@ public class BaseballElimination {
 
     public static void main(String[] args) {
         BaseballElimination baseballElimination = new BaseballElimination(args[0]);
-        int aa = baseballElimination.numberOfTeams();
+        if (baseballElimination.isEliminated("Montreal")) {
+            StdOut.print("Montreal is eliminated.");
+        }
     }
 }
