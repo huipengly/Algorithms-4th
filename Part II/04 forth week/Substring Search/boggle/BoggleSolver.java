@@ -6,14 +6,13 @@
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.TST;
+import edu.princeton.cs.algs4.TrieSET;
 
 public class BoggleSolver {
-    private final TST<Integer> tst;
+    private final MyTrieSET dict;
     // private final String[] dictionary;
-    private SET<String> validWords;         // 这里使用set，单词不会被二次添加
+    private TrieSET validWords;         // 这里使用set，单词不会被二次添加
     private boolean[][] mark;
 
     private final int[] points = { 0, 0, 0, 1, 1, 2, 3, 5 };
@@ -22,9 +21,9 @@ public class BoggleSolver {
     // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
     public BoggleSolver(String[] dictionary) {
         // this.dictionary = dictionary.clone();
-        tst = new TST<>();
+        dict = new MyTrieSET();
         for (int i = 0; i < dictionary.length; ++i) {
-            tst.put(dictionary[i], i);
+            dict.add(dictionary[i]);
         }
     }
 
@@ -39,14 +38,14 @@ public class BoggleSolver {
         str += letter;
 
         // 判断是否需要剪枝
-        if (!tst.keysWithPrefix(str).iterator().hasNext()) {
+        if (!dict.hasKeysWithPrefix(str)) {
             // 返回前取消字母的标记
             mark[m][n] = false;
             return;
         }
 
         // 判断是否出现有效的单词，既长度大于2，且在字典中，有的话添加进set
-        if (str.length() > 2 && tst.contains(str)) {
+        if (str.length() > 2 && dict.contains(str)) {
             validWords.add(str);
         }
 
@@ -73,7 +72,7 @@ public class BoggleSolver {
 
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        validWords = new SET<>();
+        validWords = new TrieSET();
         mark = new boolean[board.rows()][board.cols()];
         for (int row = 0; row != board.rows(); ++row) {
             for (int col = 0; col != board.cols(); ++col) {
@@ -89,16 +88,11 @@ public class BoggleSolver {
         return validWords;
     }
 
-    // private Iterable<String> prefixCompare(Iterable<String>, char c, int index) {
-    //
-    //     for ()
-    // }
-
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word) {
         // 先要判断是否在字典中
-        if (!tst.contains(word)) {
+        if (!dict.contains(word)) {
             return 0;
         }
         return word.length() >= 8 ? 11 : points[word.length()];
@@ -108,7 +102,8 @@ public class BoggleSolver {
         In in = new In(args[0]);
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
-        BoggleBoard board = new BoggleBoard(10, 10);
+        // BoggleBoard board = new BoggleBoard(args[1]);
+        BoggleBoard board = new BoggleBoard(200, 200);
         int score = 0;
         for (String word : solver.getAllValidWords(board)) {
             StdOut.println(word);
