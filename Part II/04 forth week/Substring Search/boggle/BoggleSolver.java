@@ -39,7 +39,7 @@ public class BoggleSolver {
         str += letter;
 
         // 判断是否需要剪枝
-        if (tst.keysWithPrefix(str) == null) {
+        if (!tst.keysWithPrefix(str).iterator().hasNext()) {
             // 返回前取消字母的标记
             mark[m][n] = false;
             return;
@@ -89,6 +89,11 @@ public class BoggleSolver {
         return validWords;
     }
 
+    // private Iterable<String> prefixCompare(Iterable<String>, char c, int index) {
+    //
+    //     for ()
+    // }
+
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word) {
@@ -99,7 +104,7 @@ public class BoggleSolver {
         In in = new In(args[0]);
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
-        BoggleBoard board = new BoggleBoard(args[1]);
+        BoggleBoard board = new BoggleBoard(10, 10);
         int score = 0;
         for (String word : solver.getAllValidWords(board)) {
             StdOut.println(word);
