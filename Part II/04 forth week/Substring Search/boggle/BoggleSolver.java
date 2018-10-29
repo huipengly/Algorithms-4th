@@ -14,6 +14,7 @@ public class BoggleSolver {
     // private final String[] dictionary;
     private TrieSET validWords;         // 这里使用set，单词不会被二次添加
     private boolean[][] mark;
+    // MyTrieSET.Node node;
 
     private final int[] points = { 0, 0, 0, 1, 1, 2, 3, 5 };
 
@@ -28,25 +29,28 @@ public class BoggleSolver {
     }
 
     // 深度优先搜索找到可能的字母组合
-    private void dfs(BoggleBoard board, int m, int n, String str) {
+    private void dfs(BoggleBoard board, int m, int n, StringBuilder sb, MyTrieSET.Node x) {
         mark[m][n] = true;
         // 处理QU情况
         String letter = String.valueOf(board.getLetter(m, n));
         if (letter.equals("Q")) {
             letter = "QU";
         }
-        str += letter;
+        sb.append(letter);
 
         // 判断是否需要剪枝
-        if (!dict.hasKeysWithPrefix(str)) {
+        MyTrieSET.Node node = dict.firstNodeWithPrefix(sb, x);
+        if (node == null) {
             // 返回前取消字母的标记
             mark[m][n] = false;
+            // 返回前将最后一个字母删除
+            sb.deleteCharAt(sb.length() - 1);
             return;
         }
 
         // 判断是否出现有效的单词，既长度大于2，且在字典中，有的话添加进set
-        if (str.length() > 2 && dict.contains(str)) {
-            validWords.add(str);
+        if (sb.length() > 2 && dict.contains(sb.toString())) {
+            validWords.add(sb.toString());
         }
 
         // 在八个方向未使用过的骰子进行dfs
@@ -61,13 +65,15 @@ public class BoggleSolver {
                     continue;
                 }
                 if (!mark[m + i][n + j]) {
-                    dfs(board, m + i, n + j, str);
+                    dfs(board, m + i, n + j, sb, node);
                 }
             }
         }
 
         // 返回时将此骰子置为false
         mark[m][n] = false;
+        // 返回前将最后一个字母删除
+        sb.deleteCharAt(sb.length() - 1);
     }
 
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
@@ -82,7 +88,7 @@ public class BoggleSolver {
 
         for (int row = 0; row != board.rows(); ++row) {
             for (int col = 0; col != board.cols(); ++col) {
-                dfs(board, row, col, "");
+                dfs(board, row, col, new StringBuilder(), null);
             }
         }
         return validWords;
@@ -102,8 +108,9 @@ public class BoggleSolver {
         In in = new In(args[0]);
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
-        // BoggleBoard board = new BoggleBoard(args[1]);
-        BoggleBoard board = new BoggleBoard(200, 200);
+        BoggleBoard board = new BoggleBoard(args[1]);
+        // BoggleBoard board = new BoggleBoard("board-points26539.txt");
+        // BoggleBoard board = new BoggleBoard(1000, 1000);
         int score = 0;
         for (String word : solver.getAllValidWords(board)) {
             StdOut.println(word);

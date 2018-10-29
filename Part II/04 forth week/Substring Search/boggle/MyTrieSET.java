@@ -8,9 +8,10 @@
 public class MyTrieSET {
     private static final int R = 26;
     private Node root;
+    // private Node lastNode;
     private int n;
 
-    private class Node {
+    public class Node {
         private boolean isString;
         private Node[] next = new Node[R];
     }
@@ -65,12 +66,18 @@ public class MyTrieSET {
         return get(x.next[c], key, d + 1);
     }
 
-    public boolean hasKeysWithPrefix(String prefix) {
+    public Node firstNodeWithPrefix(StringBuilder prefix, Node x) {
         if (prefix == null) {
             throw new java.lang.IllegalArgumentException("argument to contains() is null");
         }
-        Node x = get(root, prefix, 0);
-        return x != null;
+        // 第一次查找这个单词，从0深度开始
+        if (x == null) {
+            return get(root, prefix.toString(), 0);
+        }
+        else {  // 接着上一次的深度开始查找
+            int c = prefix.charAt(prefix.length() - 1) - 'A';
+            return get(x.next[c], prefix.toString(), prefix.length());
+        }
     }
 
     public boolean isEmpty() {
