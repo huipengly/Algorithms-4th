@@ -7,6 +7,9 @@
 
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
+import edu.princeton.cs.algs4.Queue;
+
+import java.util.Arrays;
 
 public class BurrowsWheeler {
     // apply Burrows-Wheeler transform, reading from standard input and writing to standard output
@@ -46,9 +49,25 @@ public class BurrowsWheeler {
         BinaryStdOut.close();
     }
 
-    // private static int[] constructeNext() {
-    //
-    // }
+    private static int[] constructeNext(String t) {
+        char[] firstCol = t.toCharArray();
+        boolean[] mark = new boolean[t.length()];
+        int[] next = new int[t.length()];
+        Queue<Integer> nextQueue = new Queue<>();
+        Arrays.sort(firstCol);
+        for (int i = 0; i != firstCol.length; ++i) {
+            for (int j = 0; j != mark.length; ++j) {
+                if (!mark[j] && firstCol[i] == t.charAt(j)) {
+                    mark[j] = true;
+                    nextQueue.enqueue(j);
+                }
+            }
+        }
+        for (int i = 0; i != t.length(); ++i) {
+            next[i] = nextQueue.dequeue();
+        }
+        return next;
+    }
 
     // apply Burrows-Wheeler inverse transform, reading from standard input and writing to standard output
     // 假设输入流一定正确，不需要检测
@@ -83,8 +102,8 @@ public class BurrowsWheeler {
         }
         String t = transformedStringBuilder.toString();
         // char[] originalChar = new char[t.length()];
-        // int[] next = constructeNext();
-        int[] next = { 3, 0, 6, 7, 8, 9, 10, 11, 5, 2, 1, 4 };
+        int[] next = constructeNext(t);
+        // int[] next = { 3, 0, 6, 7, 8, 9, 10, 11, 5, 2, 1, 4 };
 
         // 还原回原始信息，并输出
         for (int i = 0; i != t.length(); ++i) {
