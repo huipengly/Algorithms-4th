@@ -24,12 +24,9 @@ public class BurrowsWheeler {
         String originalString = originalStringBuilder.toString();
         // StdOut.print(originalString + "\n");
         CircularSuffixArray csa = new CircularSuffixArray(originalString);
-        BinaryStdOut.write(startFlag);
-        BinaryStdOut.write(startFlag);
-        BinaryStdOut.write(startFlag);              // 写入三个起始位
-        for (int i = 0; i != csa.length(); ++i) {   // 写入first
+        for (int i = 0; i != csa.length(); ++i) {   // 写入first，first是个int！
             if (csa.index(i) == 0) {
-                BinaryStdOut.write((char) i);
+                BinaryStdOut.write(i);
             }
         }
         // StdOut.print("\n");
@@ -52,7 +49,6 @@ public class BurrowsWheeler {
     private static int[] constructeNext(String t) {
         char[] firstCol = t.toCharArray();
         boolean[] mark = new boolean[t.length()];
-        int[] next = new int[t.length()];
         Queue<Integer> nextQueue = new Queue<>();
         Arrays.sort(firstCol);
         for (int i = 0; i != firstCol.length; ++i) {
@@ -63,6 +59,7 @@ public class BurrowsWheeler {
                 }
             }
         }
+        int[] next = new int[t.length()];
         for (int i = 0; i != t.length(); ++i) {
             next[i] = nextQueue.dequeue();
         }
@@ -75,22 +72,9 @@ public class BurrowsWheeler {
         int first;
         StringBuilder transformedStringBuilder = new StringBuilder();
         // 从流中构造原始字符串
-        // 读取前三个空白字符串
-        for (int i = 0; i != 3; ++i) {
-            if (!BinaryStdIn.isEmpty()) {
-                char c = BinaryStdIn.readChar();
-                // 判断前三个为空白
-                if (c != 0) {
-                    throw new java.lang.IllegalArgumentException("invalid input.");
-                }
-            }
-            else {
-                throw new java.lang.IllegalArgumentException("invalid input.");
-            }
-        }
         // 读取first
         if (!BinaryStdIn.isEmpty()) {
-            first = (int) BinaryStdIn.readChar();
+            first = BinaryStdIn.readInt();
         }
         else {
             throw new java.lang.IllegalArgumentException("invalid input.");
