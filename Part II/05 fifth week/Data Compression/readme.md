@@ -34,7 +34,7 @@ move-to-front编码的主要想法是维护一个字符的顺序。重复从输�
 如果输入中相同的字母出现在相互附近许多次，那么许多输出值将为很小的证书，例如0，1和2。非常高频率的确切字母将是Huffman编码的理想场景。
 
 - Move-to-front编码。你的任务是维护一个包含256个字符的额外ASCII字符串。使用字符在编码中的顺序初始化字符串。然后从输入中每次读取一个8位字符，输出在字符串中的8位索引。当c出现过，就将c移动到字符串前面。
-- Move-to-front解码。和编码初始化相同的字符串，然后从输入中每次读取一个八位字符i，将字符串中第i个字符输出，并且移动到前面。IndexPQ
+- Move-to-front解码。和编码初始化相同的字符串，然后从输入中每次读取一个八位字符i，将字符串中第i个字符输出，并且移动到前面。
 
 使用下面的api：
 
@@ -158,6 +158,8 @@ public class BurrowsWheeler {
 
 **构造函数** 根据字符串s的位数n，生成n个后缀循环字符串，并在每个字符串最后加上一个表示左移位数的数，组成一个字符串数组，这个数不会影响字符串的排序，但是可以用来产生index。然后使用MSD对数组进行排序，使用排序后的字符串的最后一位生成index。不用生成t，一是可以通过index生成，二是api没有需求。
 
+这里题目提示了，不能构造n个string，那样性能就是平方级了。可以在原始字符串上排序。使用了构造Array.sort()的比较器。从[这里](https://www.cnblogs.com/mingyueanyao/p/9558867.html)参考到[这里](https://www.cnblogs.com/lxc1910/p/8697283.html)。然后最优的方法是自己实现一个字符串的三向字符串快速排序。可以参考[这里](https://github.com/gzc/MOOC-Course/blob/master/Princeton-Algorithm2/Algorithm2/CircularSuffixArray.java)。
+
 长度和index函数返回对应的东西就行。
 
 ### BurrowsWheeler
@@ -165,5 +167,7 @@ public class BurrowsWheeler {
 **编码** 使用循环后缀数组，得到index，然后使用index产生 *t[]* ，*t[i] = s* 的第 *index[i] - 1* 位，若 *i = 0*，就是最后一位。同时记录 *index[i] = 0* 的 *i*，这个就是 *first*。
 
 **解码** 将二进制的流转换为 *first* 和 *t[]*。然后使用 *t[]* 去生成 *next[]*。最后使用 *first*， *t[]*， *next[]*来转换为原信息。
+
+逆变换排序要自己写key-index排序性能才能达标。
 
 发现好像具体压缩的程序不需要自己实现。
