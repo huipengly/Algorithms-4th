@@ -7,10 +7,6 @@
 
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
-import edu.princeton.cs.algs4.Queue;
-import edu.princeton.cs.algs4.ST;
-
-import java.util.Arrays;
 
 public class BurrowsWheeler {
     // apply Burrows-Wheeler transform, reading from standard input and writing to standard output
@@ -18,11 +14,12 @@ public class BurrowsWheeler {
         char startFlag = 0;     // 起始位
         StringBuilder originalStringBuilder = new StringBuilder();
         // 从流中构造原始字符串
-        while (!BinaryStdIn.isEmpty()) {
-            char c = BinaryStdIn.readChar();
-            originalStringBuilder.append(c);
-        }
-        String originalString = originalStringBuilder.toString();
+        // while (!BinaryStdIn.isEmpty()) {
+        //     char c = BinaryStdIn.readChar();
+        //     originalStringBuilder.append(c);
+        // }
+        // String originalString = originalStringBuilder.toString();
+        String originalString = BinaryStdIn.readString();
         // StdOut.print(originalString + "\n");
         CircularSuffixArray csa = new CircularSuffixArray(originalString);
         for (int i = 0; i != csa.length(); ++i) {   // 写入first，first是个int！
@@ -48,20 +45,23 @@ public class BurrowsWheeler {
     }
 
     private static int[] constructeNext(String t) {
-        char[] firstCol = t.toCharArray();
-        Arrays.sort(firstCol);
-        int[] next = new int[t.length()];
-        ST<Character, Queue<Integer>> tSet = new ST<>();
-        for (int i = 0; i != t.length(); ++i) {
-            char c = t.charAt(i);
-            if (tSet.get(c) == null) {
-                tSet.put(c, new Queue<>());
-            }
-            tSet.get(c).enqueue(i);
-        }
+        int R = 256;
+        int length = t.length();
+        int[] next = new int[length];
+        int[] count = new int[R + 1];
+        int[] firstCol = new int[length];
 
-        for (int i = 0; i != firstCol.length; ++i) {
-            next[i] = tSet.get(firstCol[i]).dequeue();
+        for (int i = 0; i != length; ++i) {
+            ++count[t.charAt(i) + 1];
+        }
+        for (int i = 1; i != length; ++i) {
+            count[i] += count[i - 1];
+        }
+        for (int i = 0; i != length; ++i) {
+            char c = t.charAt(i);
+            int pos = count[c]++;
+            firstCol[pos] = c;
+            next[pos] = i;
         }
 
         return next;
@@ -81,11 +81,12 @@ public class BurrowsWheeler {
             throw new java.lang.IllegalArgumentException("invalid input.");
         }
         // 读取编码
-        while (!BinaryStdIn.isEmpty()) {
-            char c = BinaryStdIn.readChar();
-            transformedStringBuilder.append(c);
-        }
-        String t = transformedStringBuilder.toString();
+        String t = BinaryStdIn.readString();
+        // while (!BinaryStdIn.isEmpty()) {
+        //     char c = BinaryStdIn.readChar();
+        //     transformedStringBuilder.append(c);
+        // }
+        // String t = transformedStringBuilder.toString();
         // char[] originalChar = new char[t.length()];
         int[] next = constructeNext(t);
         // int[] next = { 3, 0, 6, 7, 8, 9, 10, 11, 5, 2, 1, 4 };
