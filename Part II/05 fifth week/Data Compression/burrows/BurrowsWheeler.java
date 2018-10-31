@@ -8,6 +8,7 @@
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.ST;
 
 import java.util.Arrays;
 
@@ -48,21 +49,21 @@ public class BurrowsWheeler {
 
     private static int[] constructeNext(String t) {
         char[] firstCol = t.toCharArray();
-        boolean[] mark = new boolean[t.length()];
-        Queue<Integer> nextQueue = new Queue<>();
         Arrays.sort(firstCol);
-        for (int i = 0; i != firstCol.length; ++i) {
-            for (int j = 0; j != mark.length; ++j) {
-                if (!mark[j] && firstCol[i] == t.charAt(j)) {
-                    mark[j] = true;
-                    nextQueue.enqueue(j);
-                }
-            }
-        }
         int[] next = new int[t.length()];
+        ST<Character, Queue<Integer>> tSet = new ST<>();
         for (int i = 0; i != t.length(); ++i) {
-            next[i] = nextQueue.dequeue();
+            char c = t.charAt(i);
+            if (tSet.get(c) == null) {
+                tSet.put(c, new Queue<>());
+            }
+            tSet.get(c).enqueue(i);
         }
+
+        for (int i = 0; i != firstCol.length; ++i) {
+            next[i] = tSet.get(firstCol[i]).dequeue();
+        }
+
         return next;
     }
 

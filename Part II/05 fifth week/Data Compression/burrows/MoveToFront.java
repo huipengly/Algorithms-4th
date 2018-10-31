@@ -49,7 +49,8 @@ public class MoveToFront {
             char c = sequences[index];
             BinaryStdOut.write(c);
             char before = sequences[0];
-            for (int i = 0; i != index; ++i) {
+            // 这里i到index + 1是因为这个index从0开始计算的
+            for (int i = 1; i != index + 1; ++i) {
                 char temp = sequences[i];
                 sequences[i] = before;
                 before = temp;

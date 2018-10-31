@@ -22,6 +22,8 @@ public class CircularSuffixArray {
         }
         length = s.length();
         suffixArray = s;
+
+        // StdOut.print(suffixArray + "\n");
         index = new Integer[length];
         for (int i = 0; i != length; ++i) {
             index[i] = i;
@@ -29,8 +31,8 @@ public class CircularSuffixArray {
         Arrays.sort(index, new Comparator<Integer>() {
             public int compare(Integer i1, Integer i2) {
                 for (int i = 0; i != length; ++i) {
-                    char c1 = suffixArray.charAt(i1 + i % length);
-                    char c2 = suffixArray.charAt(i2 + i % length);
+                    char c1 = suffixArray.charAt((i1 + i) % length);
+                    char c2 = suffixArray.charAt((i2 + i) % length);
                     if (c1 < c2) {
                         return -1;
                     }
@@ -41,6 +43,9 @@ public class CircularSuffixArray {
                 return 0;
             }
         });
+        // for (int i = 0; i != length; ++i) {
+        //     StdOut.print(index[i] + "\t");
+        // }
     }
 
     // length of s
@@ -50,15 +55,17 @@ public class CircularSuffixArray {
 
     // returns index of ith sorted suffix
     public int index(int i) {
-        if (i < 0 || i > length) {
-            throw new java.lang.IllegalArgumentException("i must between 0 and " + (length - 1));
+        if (i < 0 || i > length - 1) {
+            throw new java.lang.IllegalArgumentException(
+                    "i must between 0 and " + (length - 1));
         }
         return index[i];
     }
 
     // unit testing (required)
     public static void main(String[] args) {
-        CircularSuffixArray circularSuffixArray = new CircularSuffixArray("ABRACADABRA!");
+        CircularSuffixArray circularSuffixArray = new CircularSuffixArray(
+                "BAABABBAABABBBBABBBAABBBBBBBBABBAABBAAAABABABBBBBAABAABBAAAB");
         StdOut.print(circularSuffixArray.length() + "\n");
         for (int i = 0; i != circularSuffixArray.length; ++i) {
             StdOut.print(circularSuffixArray.index(i) + "\n");
