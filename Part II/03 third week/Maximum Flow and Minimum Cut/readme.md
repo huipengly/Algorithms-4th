@@ -50,7 +50,7 @@ public Iterable<String> certificateOfElimination(String team)  // subset R of te
 ## 2. 题目分析
 
 ### 构造函数
-构造函数需要读取文件，按照string读取一行，然后使用空格切分string。构造w[i]、l[i]、r[i]、g[i][j]、队伍名的set。
+构造函数需要读取文件，按照string读取一行，然后使用空格切分string。构造w[i]、l[i]、r[i]、g[i][j]、队伍名的map，对应string和编号。
 
 ### 判断是否被淘汰
 输入一个队伍x，首先判断是否被无关紧要的淘汰。若无法判断，则使用不平凡的淘汰判断。
@@ -65,3 +65,5 @@ public Iterable<String> certificateOfElimination(String team)  // subset R of te
 与上面判断是否被淘汰相同，只是不查找最大流，找到从顶点s开始的最小切分。遍历队伍组合是否在最小切分中。
 
 **关于遍历队伍组合** 两个for嵌套，内层for从上一层+1开始。队伍组合按照这种顺序从1开始标号。（顶点0为s顶点）
+
+**关于图中的编号** 0-n表示队伍，刚好和队伍编号一致。最后两个表示s和t。其余的表示队伍组合。
