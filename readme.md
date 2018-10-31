@@ -31,15 +31,15 @@
 
 3. third week
 
-    [Programming Assignment 3: Baseball Elimination](Part%20II/02%20third%20week/Maximum%20Flow%20Fand%20FMinimum%20FCut)
+    [Programming Assignment 3: Baseball Elimination](Part%20II/03%20third%20week/Maximum%20Flow%20and%20Minimum%20Cut)
 
 4. forth week
 
-    [Programming Assignment 4: Boggle](Part%20II/02%20forth%20week/Substring%20Search)（未满分）
+    [Programming Assignment 4: Boggle](Part%20II/04%20forth%20week/Substring%20Search)（未满分）
 
 5. fifth week
 
-    [Programming Assignment 5: Burrows–Wheeler Data Compression](Part%20II/02%20fifth%20week/Data%20Compression)（未满分）
+    [Programming Assignment 5: Burrows–Wheeler Data Compression](Part%20II/05%20fifth%20week/Data%20Compression)（未满分）
 
     
 以上代码除了标注的，其余为100分，格式上可能不好看。
