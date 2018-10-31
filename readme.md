@@ -19,16 +19,29 @@
 5. fifth week
 
     [Programming Assignment 5: Kd-Trees](Part%20I/05%20fifth%20week/Geometric%20Applications%20of%20BSTs/readme.md)
-    
-以上代码均100分，格式上可能不好看，但是都已实现功能，包括extra。
-
-PS：不是写java的，只是为了实现思想，代码写的比较差，看看就好。
 
 ### Part II
 1. first week
 
     [Programming Assignment 1: WordNet](Part%20II/01%20first%20week/Directed%20Graphs)
 
-## ToDo Lists
+2. second week
 
- - [ ] Kd-Trees里的内存和时间的具体分析
+    [Programming Assignment 2: Seam Carving](Part%20II/02%20second%20week/Shortest%20Paths)
+
+3. third week
+
+    [Programming Assignment 3: Baseball Elimination](Part%20II/02%20third%20week/Maximum%20Flow%20Fand%20FMinimum%20FCut)
+
+4. forth week
+
+    [Programming Assignment 4: Boggle](Part%20II/02%20forth%20week/Substring%20Search)（未满分）
+
+5. fifth week
+
+    [Programming Assignment 5: Burrows–Wheeler Data Compression](Part%20II/02%20fifth%20week/Data%20Compression)（未满分）
+
+    
+以上代码除了标注的，其余为100分，格式上可能不好看。
+
+PS：不是写java的，只是为了实现思想，代码写的比较差，看看就好。
